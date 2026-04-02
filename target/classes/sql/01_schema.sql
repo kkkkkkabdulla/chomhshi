@@ -1,0 +1,90 @@
+CREATE DATABASE IF NOT EXISTS `campus_platform` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `campus_platform`;
+
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `openid` VARCHAR(100) UNIQUE COMMENT '微信openid',
+  `phone` VARCHAR(20) UNIQUE NOT NULL COMMENT '手机号',
+  `nickname` VARCHAR(50) DEFAULT '用户' COMMENT '昵称',
+  `avatar_url` VARCHAR(255) COMMENT '头像URL',
+  `wx_nickname` VARCHAR(50) COMMENT '微信昵称',
+  `wx_avatar` VARCHAR(255) COMMENT '微信头像',
+  `role` TINYINT DEFAULT 1 COMMENT '1-普通用户 2-管理员',
+  `status` TINYINT DEFAULT 1 COMMENT '1-正常 0-封禁',
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
+CREATE TABLE IF NOT EXISTS `admin` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `username` VARCHAR(50) NOT NULL,
+  `password` VARCHAR(100) NOT NULL,
+  `status` TINYINT DEFAULT 1 COMMENT '1-启用 0-禁用',
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员表';
+
+CREATE TABLE IF NOT EXISTS `post` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` INT NOT NULL COMMENT '发布者ID',
+  `type` TINYINT NOT NULL COMMENT '1-失物招领 2-二手物品',
+  `title` VARCHAR(200) NOT NULL,
+  `description` TEXT,
+  `category` VARCHAR(50),
+  `price` DECIMAL(10,2),
+  `location` VARCHAR(100),
+  `lost_found_time` DATETIME,
+  `lost_status` TINYINT COMMENT '1-我丢失了 2-我捡到了',
+  `images` TEXT COMMENT 'JSON URL数组',
+  `contact` VARCHAR(100),
+  `status` TINYINT DEFAULT 0 COMMENT '0-待审核 1-通过 2-拒绝 3-下架',
+  `view_count` INT DEFAULT 0,
+  `like_count` INT DEFAULT 0,
+  `comment_count` INT DEFAULT 0,
+  `report_count` INT DEFAULT 0,
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='帖子表';
+
+CREATE TABLE IF NOT EXISTS `user_token` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` INT NOT NULL,
+  `token` VARCHAR(255) UNIQUE NOT NULL,
+  `expire_time` DATETIME NOT NULL,
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户Token表';
+
+CREATE TABLE IF NOT EXISTS `post_like` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `post_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='点赞表';
+
+CREATE TABLE IF NOT EXISTS `post_comment` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `post_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `content` TEXT NOT NULL,
+  `parent_id` INT DEFAULT 0,
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表';
+
+CREATE TABLE IF NOT EXISTS `post_report` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `post_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `reason` VARCHAR(100),
+  `description` TEXT,
+  `status` TINYINT DEFAULT 0 COMMENT '0待处理 1通过 2拒绝',
+  `admin_id` INT,
+  `handle_time` DATETIME,
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='举报表';
+
+CREATE TABLE IF NOT EXISTS `sensitive_word` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `word` VARCHAR(50) NOT NULL,
+  `level` TINYINT DEFAULT 1,
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='敏感词表';

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.mapper.UserTokenMapper">
+
+    <resultMap id="BaseResultMap" type="com.campus.entity.UserToken">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="token" property="token"/>
+        <result column="expire_time" property="expireTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="findByToken" resultMap="BaseResultMap">
+        SELECT id, user_id, token, expire_time, create_time
+        FROM user_token
+        WHERE token = #{token}
+        LIMIT 1
+    </select>
+
+    <select id="findByUserId" resultMap="BaseResultMap">
+        SELECT id, user_id, token, expire_time, create_time
+        FROM user_token
+        WHERE user_id = #{userId}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.campus.entity.UserToken" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_token(user_id, token, expire_time)
+        VALUES(#{userId}, #{token}, #{expireTime})
+    </insert>
+
+    <update id="updateByUserId" parameterType="com.campus.entity.UserToken">
+        UPDATE user_token
+        SET token = #{token}, expire_time = #{expireTime}
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

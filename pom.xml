@@ -91,6 +91,13 @@
             <version>6.2.5.Final</version>
         </dependency>
 
+        <!-- JSR-250 (@Resource) -->
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+
         <!-- Servlet / JSP -->
         <dependency>
             <groupId>javax.servlet</groupId>

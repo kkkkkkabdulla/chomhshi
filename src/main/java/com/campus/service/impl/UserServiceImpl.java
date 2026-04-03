@@ -2,6 +2,7 @@ package com.campus.service.impl;
 
 import com.campus.common.BusinessException;
 import com.campus.common.ResultCode;
+import com.campus.dto.request.UpdateUserInfoReq;
 import com.campus.dto.request.WxLoginReq;
 import com.campus.dto.response.LoginResp;
 import com.campus.dto.response.UserInfoResp;
@@ -100,6 +101,19 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
         }
         return user;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserInfo(Integer userId, UpdateUserInfoReq req) {
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
+        }
+        int rows = userMapper.updateUserInfoById(userId, req.getNickname(), req.getAvatarUrl());
+        if (rows <= 0) {
+            throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "更新失败，请稍后重试");
+        }
     }
 
     private UserInfoResp buildUserInfo(User user) {

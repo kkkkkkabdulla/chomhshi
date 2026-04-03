@@ -1,6 +1,7 @@
 package com.campus.controller;
 
 import com.campus.common.Result;
+import com.campus.dto.request.UpdateUserInfoReq;
 import com.campus.dto.request.WxLoginReq;
 import com.campus.dto.response.LoginResp;
 import com.campus.dto.response.UserInfoResp;
@@ -10,6 +11,7 @@ import com.campus.service.UserService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +45,13 @@ public class UserController {
         User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
         UserInfoResp resp = convert(userService.getUserById(user.getId()));
         return Result.success(resp);
+    }
+
+    @PutMapping("/updateInfo")
+    public Result<Void> updateInfo(@Valid @RequestBody UpdateUserInfoReq req, HttpServletRequest request) {
+        User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
+        userService.updateUserInfo(user.getId(), req);
+        return Result.success("更新成功", null);
     }
 
     private UserInfoResp convert(User user) {

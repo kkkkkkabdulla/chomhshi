@@ -35,4 +35,11 @@
         VALUES(#{openid}, #{phone}, #{nickname}, #{avatarUrl}, #{role}, #{status})
     </insert>
 
+    <update id="updateUserInfoById">
+        UPDATE user
+        SET nickname = #{nickname},
+            avatar_url = #{avatarUrl}
+        WHERE id = #{id}
+    </update>
+
 </mapper>

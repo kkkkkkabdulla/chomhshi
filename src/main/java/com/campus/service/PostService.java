@@ -13,4 +13,8 @@ public interface PostService {
     PageResult<Post> list(Integer type, String keyword, String category, Integer page, Integer pageSize);
 
     Post detail(Integer id);
+
+    void update(Integer userId, Integer postId, PostPublishReq req);
+
+    void delete(Integer userId, Integer postId);
 }

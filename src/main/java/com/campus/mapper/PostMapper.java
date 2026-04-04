@@ -26,4 +26,10 @@ public interface PostMapper {
                             @Param("category") String category);
 
     Post findApprovedDetailById(@Param("id") Integer id);
+
+    Post findById(@Param("id") Integer id);
+
+    int updateById(Post post);
+
+    int deleteById(@Param("id") Integer id);
 }

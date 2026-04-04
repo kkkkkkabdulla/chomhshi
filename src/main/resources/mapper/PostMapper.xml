@@ -100,4 +100,34 @@
         LIMIT 1
     </select>
 
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT id, user_id, type, title, description, category, price, location,
+               lost_found_time, lost_status, images, contact, status,
+               view_count, like_count, comment_count, report_count,
+               create_time, update_time
+        FROM post
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <update id="updateById" parameterType="com.campus.entity.Post">
+        UPDATE post
+        SET title = #{title},
+            description = #{description},
+            category = #{category},
+            price = #{price},
+            location = #{location},
+            lost_found_time = #{lostFoundTime},
+            lost_status = #{lostStatus},
+            images = #{images},
+            contact = #{contact},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM post
+        WHERE id = #{id}
+    </delete>
+
 </mapper>

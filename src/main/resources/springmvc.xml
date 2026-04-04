@@ -9,15 +9,24 @@
 
     <context:component-scan base-package="com.campus.controller,com.campus.common,com.campus.interceptor"/>
 
+    <context:property-placeholder location="classpath:application.properties"/>
+
     <mvc:annotation-driven/>
 
     <bean id="tokenInterceptor" class="com.campus.interceptor.TokenInterceptor"/>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="maxUploadSize" value="5242880"/>
+        <property name="maxInMemorySize" value="40960"/>
+    </bean>
 
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/api/**"/>
             <mvc:exclude-mapping path="/api/ping"/>
             <mvc:exclude-mapping path="/api/user/wxLogin"/>
+            <mvc:exclude-mapping path="/api/upload/file/**"/>
             <ref bean="tokenInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

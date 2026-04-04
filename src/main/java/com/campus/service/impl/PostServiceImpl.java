@@ -93,6 +93,46 @@ public class PostServiceImpl implements PostService {
         return post;
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(Integer userId, Integer postId, PostPublishReq req) {
+        Post post = requireOwnedPost(userId, postId);
+        if (post.getStatus() != null && post.getStatus() != 0) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "仅待审核帖子允许编辑");
+        }
+
+        validateTypeSpecificFields(req);
+        checkSensitiveContent(req);
+
+        post.setTitle(req.getTitle());
+        post.setDescription(req.getDescription());
+        post.setCategory(req.getCategory());
+        post.setPrice(req.getPrice());
+        post.setLocation(req.getLocation());
+        post.setLostFoundTime(parseLostFoundTime(req.getLostFoundTime()));
+        post.setLostStatus(req.getLostStatus());
+        post.setImages(req.getImages());
+        post.setContact(req.getContact());
+
+        int rows = postMapper.updateById(post);
+        if (rows <= 0) {
+            throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "编辑失败，请稍后重试");
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(Integer userId, Integer postId) {
+        Post post = requireOwnedPost(userId, postId);
+        if (post.getStatus() != null && post.getStatus() == 1) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "审核通过的帖子暂不支持删除");
+        }
+        int rows = postMapper.deleteById(postId);
+        if (rows <= 0) {
+            throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "删除失败，请稍后重试");
+        }
+    }
+
     private void validateTypeSpecificFields(PostPublishReq req) {
         if (req.getType() == null) {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "帖子类型不能为空");
@@ -138,6 +178,17 @@ public class PostServiceImpl implements PostService {
         } catch (ParseException e) {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "lostFoundTime 格式应为 yyyy-MM-dd HH:mm:ss");
         }
+    }
+
+    private Post requireOwnedPost(Integer userId, Integer postId) {
+        Post post = postMapper.findById(postId);
+        if (post == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "帖子不存在");
+        }
+        if (!userId.equals(post.getUserId())) {
+            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权操作他人帖子");
+        }
+        return post;
     }
 
     private String trimToNull(String str) {

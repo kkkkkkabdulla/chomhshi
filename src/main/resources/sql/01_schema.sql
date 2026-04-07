@@ -15,6 +15,16 @@ CREATE TABLE IF NOT EXISTS `user` (
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
+USE campus_platform;
+
+CREATE TABLE IF NOT EXISTS `admin_token` (
+                                             `id` INT PRIMARY KEY AUTO_INCREMENT,
+                                             `admin_id` INT NOT NULL,
+                                             `token` VARCHAR(255) UNIQUE NOT NULL,
+                                             `expire_time` DATETIME NOT NULL,
+                                             `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员Token表';
+
 CREATE TABLE IF NOT EXISTS `admin` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
   `username` VARCHAR(50) NOT NULL,
@@ -23,6 +33,14 @@ CREATE TABLE IF NOT EXISTS `admin` (
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员表';
+
+CREATE TABLE IF NOT EXISTS `admin_token` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `admin_id` INT NOT NULL,
+  `token` VARCHAR(255) UNIQUE NOT NULL,
+  `expire_time` DATETIME NOT NULL,
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员Token表';
 
 CREATE TABLE IF NOT EXISTS `post` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,

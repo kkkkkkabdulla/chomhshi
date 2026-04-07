@@ -1,0 +1,33 @@
+/* 全局样式 */
+page {
+  background: #f5f6fa;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.04);
+  margin: 24rpx 16rpx;
+  padding: 24rpx;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #36d1c4, #5b86e5);
+  color: #fff;
+  border-radius: 24rpx;
+  padding: 16rpx 0;
+  font-size: 32rpx;
+  margin: 32rpx 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-between {
+  justify-content: space-between;
+}
+
+.flex-center {
+  align-items: center;
+}

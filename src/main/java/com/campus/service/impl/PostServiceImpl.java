@@ -4,7 +4,10 @@ import com.campus.common.BusinessException;
 import com.campus.common.PageResult;
 import com.campus.common.ResultCode;
 import com.campus.dto.request.PostPublishReq;
+import com.campus.dto.response.PostLikeResp;
+import com.campus.dto.response.PostPublishResp;
 import com.campus.entity.Post;
+import com.campus.mapper.PostLikeMapper;
 import com.campus.mapper.PostMapper;
 import com.campus.service.PostService;
 import com.campus.service.SensitiveWordService;
@@ -29,11 +32,17 @@ public class PostServiceImpl implements PostService {
     @Resource
     private SensitiveWordService sensitiveWordService;
 
+    @Resource
+    private PostLikeMapper postLikeMapper;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Integer publish(Integer userId, PostPublishReq req) {
+    public PostPublishResp publish(Integer userId, PostPublishReq req) {
         validateTypeSpecificFields(req);
-        checkSensitiveContent(req);
+
+        String hitWord = detectSensitiveContent(req);
+        boolean autoApproved = (hitWord == null);
+        int status = autoApproved ? 1 : 0;
 
         Post post = new Post();
         post.setUserId(userId);
@@ -48,8 +57,8 @@ public class PostServiceImpl implements PostService {
         post.setImages(req.getImages());
         post.setContact(req.getContact());
 
-        // 发布默认状态：待审核
-        post.setStatus(0);
+        // 自动审核逻辑：未命中敏感词 -> 直接通过(status=1)，命中 -> 进入人工审核(status=0)
+        post.setStatus(status);
         post.setViewCount(0);
         post.setLikeCount(0);
         post.setCommentCount(0);
@@ -59,7 +68,9 @@ public class PostServiceImpl implements PostService {
         if (rows <= 0 || post.getId() == null) {
             throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "发布失败，请稍后重试");
         }
-        return post.getId();
+
+        String reviewNote = autoApproved ? "自动审核通过，已上架" : ("命中敏感词「" + hitWord + "」，已进入人工审核队列");
+        return new PostPublishResp(post.getId(), status, autoApproved, reviewNote);
     }
 
     @Override
@@ -102,7 +113,7 @@ public class PostServiceImpl implements PostService {
         }
 
         validateTypeSpecificFields(req);
-        checkSensitiveContent(req);
+        checkSensitiveContentForUpdate(req);
 
         post.setTitle(req.getTitle());
         post.setDescription(req.getDescription());
@@ -124,13 +135,39 @@ public class PostServiceImpl implements PostService {
     @Transactional(rollbackFor = Exception.class)
     public void delete(Integer userId, Integer postId) {
         Post post = requireOwnedPost(userId, postId);
-        if (post.getStatus() != null && post.getStatus() == 1) {
-            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "审核通过的帖子暂不支持删除");
-        }
         int rows = postMapper.deleteById(postId);
         if (rows <= 0) {
             throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "删除失败，请稍后重试");
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PostLikeResp toggleLike(Integer userId, Integer postId) {
+        Post post = postMapper.findById(postId);
+        if (post == null || post.getStatus() == null || post.getStatus() != 1) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "帖子不存在或不可点赞");
+        }
+
+        Integer count = postLikeMapper.countByPostAndUser(postId, userId);
+        boolean currentlyLiked = count != null && count > 0;
+
+        if (currentlyLiked) {
+            postLikeMapper.delete(postId, userId);
+            postMapper.decreaseLikeCount(postId);
+        } else {
+            postLikeMapper.insert(postId, userId);
+            postMapper.increaseLikeCount(postId);
+        }
+
+        Post latest = postMapper.findById(postId);
+        return new PostLikeResp(!currentlyLiked, latest == null ? 0 : latest.getLikeCount());
+    }
+
+    @Override
+    public boolean isLiked(Integer userId, Integer postId) {
+        Integer count = postLikeMapper.countByPostAndUser(postId, userId);
+        return count != null && count > 0;
     }
 
     private void validateTypeSpecificFields(PostPublishReq req) {
@@ -138,34 +175,29 @@ public class PostServiceImpl implements PostService {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "帖子类型不能为空");
         }
 
-        if (POST_TYPE_SECOND_HAND == req.getType()) {
-            if (req.getPrice() == null) {
-                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "二手物品价格不能为空");
-            }
-            if (isBlank(req.getCategory())) {
-                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "二手物品类别不能为空");
-            }
+        if (isBlank(req.getContact())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "联系方式不能为空");
         }
 
-        if (POST_TYPE_LOST_FOUND == req.getType()) {
-            if (isBlank(req.getLocation())) {
-                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "失物招领地点不能为空");
-            }
-            if (req.getLostStatus() == null) {
-                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "失物状态不能为空");
+        if (POST_TYPE_SECOND_HAND == req.getType() && "二手物品".equals(req.getCategory())) {
+            if (req.getPrice() == null) {
+                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "二手物品价格不能为空");
             }
         }
     }
 
-    private void checkSensitiveContent(PostPublishReq req) {
+    private String detectSensitiveContent(PostPublishReq req) {
         String hitInTitle = sensitiveWordService.detectFirstHit(req.getTitle());
         if (hitInTitle != null) {
-            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "标题包含敏感词：" + hitInTitle);
+            return hitInTitle;
         }
+        return sensitiveWordService.detectFirstHit(req.getDescription());
+    }
 
-        String hitInDesc = sensitiveWordService.detectFirstHit(req.getDescription());
-        if (hitInDesc != null) {
-            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "描述包含敏感词：" + hitInDesc);
+    private void checkSensitiveContentForUpdate(PostPublishReq req) {
+        String hitWord = detectSensitiveContent(req);
+        if (hitWord != null) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "内容包含敏感词：" + hitWord);
         }
     }
 

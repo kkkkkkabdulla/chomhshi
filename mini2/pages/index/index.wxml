@@ -1,0 +1,20 @@
+<view class="flex flex-between" style="padding: 24rpx 16rpx;">
+  <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
+    <view class="card">分类：{{category}}</view>
+  </picker>
+  <input class="card" placeholder="搜索物品/失物" confirm-type="search" bindconfirm="onSearch" />
+</view>
+<block wx:for="{{posts}}" wx:key="id">
+  <view class="card" bindtap="goDetail" data-id="{{item.id}}">
+    <view class="flex flex-between flex-center">
+      <text style="font-weight:bold;font-size:36rpx">{{item.title}}</text>
+      <text wx:if="{{item.type==='lost'}}" style="color:#ff9800">失物招领</text>
+      <text wx:elif="{{item.type==='second'}}" style="color:#36d1c4">二手交易</text>
+    </view>
+    <view style="margin: 16rpx 0; color:#888">{{item.desc}}</view>
+    <view class="flex flex-between flex-center">
+      <text>发布人：{{item.nickname}}</text>
+      <text wx:if="{{item.price}}">￥{{item.price}}</text>
+    </view>
+  </view>
+</block>

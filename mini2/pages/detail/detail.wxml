@@ -1,0 +1,16 @@
+<view class="card">
+  <view class="flex flex-between flex-center">
+    <text style="font-weight:bold;font-size:40rpx">{{post.title}}</text>
+    <text wx:if="{{post.type==='lost'}}" style="color:#ff9800">失物招领</text>
+    <text wx:elif="{{post.type==='second'}}" style="color:#36d1c4">二手交易</text>
+  </view>
+  <view style="margin: 16rpx 0; color:#888">{{post.desc}}</view>
+  <image wx:if="{{post.img}}" src="{{post.img}}" style="width:100%;border-radius:12rpx;margin:16rpx 0;" mode="aspectFill" />
+  <view class="flex flex-between flex-center">
+    <text>发布人：{{post.nickname}}</text>
+    <text wx:if="{{post.price}}">￥{{post.price}}</text>
+  </view>
+  <view style="margin-top:32rpx">
+    <button class="btn-primary" open-type="contact">联系TA</button>
+  </view>
+</view>

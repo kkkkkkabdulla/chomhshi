@@ -130,4 +130,71 @@
         WHERE id = #{id}
     </delete>
 
+    <update id="increaseLikeCount">
+        UPDATE post
+        SET like_count = like_count + 1,
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="decreaseLikeCount">
+        UPDATE post
+        SET like_count = CASE WHEN like_count > 0 THEN like_count - 1 ELSE 0 END,
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="increaseCommentCount">
+        UPDATE post
+        SET comment_count = comment_count + 1,
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="decreaseCommentCount">
+        UPDATE post
+        SET comment_count = CASE WHEN comment_count > 0 THEN comment_count - 1 ELSE 0 END,
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="increaseReportCount">
+        UPDATE post
+        SET report_count = report_count + 1,
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE post
+        SET status = #{status},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="findByStatus" resultMap="BaseResultMap">
+        SELECT id, user_id, type, title, description, category, price, location,
+               lost_found_time, lost_status, images, contact, status,
+               view_count, like_count, comment_count, report_count,
+               create_time, update_time
+        FROM post
+        <where>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countByStatus" resultType="long">
+        SELECT COUNT(1)
+        FROM post
+        <where>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </where>
+    </select>
+
 </mapper>

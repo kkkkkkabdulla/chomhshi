@@ -32,4 +32,22 @@ public interface PostMapper {
     int updateById(Post post);
 
     int deleteById(@Param("id") Integer id);
+
+    int increaseLikeCount(@Param("id") Integer id);
+
+    int decreaseLikeCount(@Param("id") Integer id);
+
+    int increaseCommentCount(@Param("id") Integer id);
+
+    int decreaseCommentCount(@Param("id") Integer id);
+
+    int increaseReportCount(@Param("id") Integer id);
+
+    int updateStatus(@Param("id") Integer id, @Param("status") Integer status);
+
+    List<Post> findByStatus(@Param("status") Integer status,
+                            @Param("offset") Integer offset,
+                            @Param("pageSize") Integer pageSize);
+
+    long countByStatus(@Param("status") Integer status);
 }

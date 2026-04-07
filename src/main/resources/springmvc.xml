@@ -14,6 +14,7 @@
     <mvc:annotation-driven/>
 
     <bean id="tokenInterceptor" class="com.campus.interceptor.TokenInterceptor"/>
+    <bean id="adminTokenInterceptor" class="com.campus.interceptor.AdminTokenInterceptor"/>
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="defaultEncoding" value="UTF-8"/>
@@ -26,8 +27,17 @@
             <mvc:mapping path="/api/**"/>
             <mvc:exclude-mapping path="/api/ping"/>
             <mvc:exclude-mapping path="/api/user/wxLogin"/>
+            <mvc:exclude-mapping path="/api/admin/login"/>
             <mvc:exclude-mapping path="/api/upload/file/**"/>
+            <mvc:exclude-mapping path="/api/post/list"/>
+            <mvc:exclude-mapping path="/api/post/detail/**"/>
+            <mvc:exclude-mapping path="/api/comment/list/**"/>
             <ref bean="tokenInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/api/admin/**"/>
+            <mvc:exclude-mapping path="/api/admin/login"/>
+            <ref bean="adminTokenInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
 

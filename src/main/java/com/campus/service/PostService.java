@@ -2,11 +2,13 @@ package com.campus.service;
 
 import com.campus.common.PageResult;
 import com.campus.dto.request.PostPublishReq;
+import com.campus.dto.response.PostLikeResp;
+import com.campus.dto.response.PostPublishResp;
 import com.campus.entity.Post;
 
 public interface PostService {
 
-    Integer publish(Integer userId, PostPublishReq req);
+    PostPublishResp publish(Integer userId, PostPublishReq req);
 
     PageResult<Post> myList(Integer userId, Integer page, Integer pageSize);
 
@@ -17,4 +19,8 @@ public interface PostService {
     void update(Integer userId, Integer postId, PostPublishReq req);
 
     void delete(Integer userId, Integer postId);
+
+    PostLikeResp toggleLike(Integer userId, Integer postId);
+
+    boolean isLiked(Integer userId, Integer postId);
 }

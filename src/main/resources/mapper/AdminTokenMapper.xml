@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.mapper.AdminTokenMapper">
+
+    <resultMap id="BaseResultMap" type="com.campus.entity.AdminToken">
+        <id column="id" property="id"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="token" property="token"/>
+        <result column="expire_time" property="expireTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="findByToken" resultMap="BaseResultMap">
+        SELECT id, admin_id, token, expire_time, create_time
+        FROM admin_token
+        WHERE token = #{token}
+        LIMIT 1
+    </select>
+
+    <select id="findByAdminId" resultMap="BaseResultMap">
+        SELECT id, admin_id, token, expire_time, create_time
+        FROM admin_token
+        WHERE admin_id = #{adminId}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.campus.entity.AdminToken" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO admin_token(admin_id, token, expire_time)
+        VALUES(#{adminId}, #{token}, #{expireTime})
+    </insert>
+
+    <update id="updateByAdminId" parameterType="com.campus.entity.AdminToken">
+        UPDATE admin_token
+        SET token = #{token}, expire_time = #{expireTime}
+        WHERE admin_id = #{adminId}
+    </update>
+
+</mapper>

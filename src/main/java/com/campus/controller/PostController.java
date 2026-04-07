@@ -3,6 +3,7 @@ package com.campus.controller;
 import com.campus.common.PageResult;
 import com.campus.common.Result;
 import com.campus.dto.request.PostPublishReq;
+import com.campus.dto.response.PostLikeResp;
 import com.campus.dto.response.PostPublishResp;
 import com.campus.entity.Post;
 import com.campus.entity.User;
@@ -34,8 +35,9 @@ public class PostController {
     @PostMapping("/publish")
     public Result<PostPublishResp> publish(@Valid @RequestBody PostPublishReq req, HttpServletRequest request) {
         User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
-        Integer postId = postService.publish(user.getId(), req);
-        return Result.success("发布成功，等待审核", new PostPublishResp(postId));
+        PostPublishResp resp = postService.publish(user.getId(), req);
+        String msg = resp.isAutoApproved() ? "发布成功，自动审核通过" : "发布成功，已进入人工审核";
+        return Result.success(msg, resp);
     }
 
     @GetMapping("/myList")
@@ -74,5 +76,18 @@ public class PostController {
         User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
         postService.delete(user.getId(), id);
         return Result.success("删除成功", null);
+    }
+
+    @PostMapping("/like/{id}")
+    public Result<PostLikeResp> like(@PathVariable("id") Integer id, HttpServletRequest request) {
+        User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
+        return Result.success(postService.toggleLike(user.getId(), id));
+    }
+
+    @GetMapping("/isLiked/{id}")
+    public Result<PostLikeResp> isLiked(@PathVariable("id") Integer id, HttpServletRequest request) {
+        User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
+        boolean liked = postService.isLiked(user.getId(), id);
+        return Result.success(new PostLikeResp(liked, null));
     }
 }

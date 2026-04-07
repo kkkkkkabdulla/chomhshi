@@ -1,0 +1,31 @@
+<view class="card">
+  <block wx:if="{{userInfo.nickName}}">
+    <view class="flex flex-center">
+      <image src="{{userInfo.avatarUrl}}" style="width:120rpx;height:120rpx;border-radius:50%" />
+      <text style="margin-left:24rpx;font-size:36rpx">{{userInfo.nickName}}</text>
+    </view>
+    <button class="btn-primary" bindtap="logout">退出登录</button>
+  </block>
+  <block wx:else>
+    <button class="btn-primary" bindtap="goLogin">登录/注册</button>
+  </block>
+</view>
+<view class="card">
+  <view class="flex flex-between flex-center" style="margin-bottom:16rpx">
+    <text style="font-weight:bold">我发布的</text>
+  </view>
+  <block wx:if="{{myPosts.length}}">
+    <block wx:for="{{myPosts}}" wx:key="id">
+      <view class="card" bindtap="goDetail" data-id="{{item.id}}">
+        <view class="flex flex-between flex-center">
+          <text>{{item.title}}</text>
+          <text wx:if="{{item.type==='lost'}}" style="color:#ff9800">失物招领</text>
+          <text wx:elif="{{item.type==='second'}}" style="color:#36d1c4">二手交易</text>
+        </view>
+      </view>
+    </block>
+  </block>
+  <block wx:else>
+    <text>暂无发布内容</text>
+  </block>
+</view>

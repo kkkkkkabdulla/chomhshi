@@ -1,0 +1,14 @@
+<view class="container" style="padding-top: 80rpx;">
+  <view class="card" style="text-align:center;">
+    <view style="font-size: 42rpx; font-weight: 700; margin-bottom: 12rpx;">校园信息平台</view>
+    <view class="muted" style="margin-bottom: 24rpx;">二手交易与失物招领一体化服务</view>
+
+    <view class="icon-text" style="justify-content:center;margin-bottom:20rpx;">
+      <image class="icon-sm" src="/assets/icons/me.svg" mode="aspectFit" />
+      <text class="muted">当前为开发模式（mock 登录）</text>
+    </view>
+
+    <input class="input" placeholder="输入 mock code，例如 123456" value="{{code}}" bindinput="onCodeInput" />
+    <button class="btn-primary" bindtap="onLogin" loading="{{loading}}" disabled="{{loading}}" style="position: relative; left: -2rpx; top: -2rpx">登录并进入</button>
+  </view>
+</view>

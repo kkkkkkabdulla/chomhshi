@@ -1,0 +1,43 @@
+.cover-list {
+  white-space: nowrap;
+}
+
+.cover-img {
+  width: 220rpx;
+  height: 220rpx;
+  margin-right: 12rpx;
+  border-radius: 10rpx;
+  display: inline-block;
+  background: #f2f3f5;
+}
+
+.heart-container {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heart-icon {
+  width: 64rpx;
+  height: 64rpx;
+}
+
+.animate-liked {
+  animation: heart-bounce 0.42s ease;
+}
+
+@keyframes heart-bounce {
+  0% {
+    transform: scale(0.3);
+  }
+
+  45% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}

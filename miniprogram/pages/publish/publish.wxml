@@ -1,0 +1,40 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">发布动态</view>
+
+    <view class="muted" style="margin-bottom:10rpx;">请选择分类（必选）</view>
+    <view class="row" style="gap:14rpx;flex-wrap:wrap;margin-bottom:18rpx;">
+      <view
+        wx:for="{{categoryTabs}}"
+        wx:key="value"
+        class="tag"
+        style="padding:10rpx 16rpx;font-size:26rpx;background:{{activeCategory === item.value ? '#e8f3ff' : '#f7f8fa'}};"
+        data-value="{{item.value}}"
+        bindtap="onCategorySelect"
+      >
+        <text style="color: {{activeCategory === item.value ? '#1677ff' : '#4e5969'}};font-weight:{{activeCategory === item.value ? '700' : '500'}};">{{item.label}}</text>
+      </view>
+    </view>
+
+    <input class="input" placeholder="标题" value="{{form.title}}" data-key="title" bindinput="onInput" />
+    <textarea class="input" placeholder="内容描述" value="{{form.description}}" data-key="description" bindinput="onInput" />
+
+    <input wx:if="{{activeCategory === '二手物品'}}" class="input" placeholder="价格（元）" value="{{form.price}}" data-key="price" bindinput="onInput" />
+    <input class="input" placeholder="联系方式（微信/手机号）" value="{{form.contact}}" data-key="contact" bindinput="onInput" />
+
+    <view class="row-between" style="margin:8rpx 0 12rpx;">
+      <view class="muted">图片（最多6张）</view>
+      <view class="muted">已上传 {{imageUrls.length}} 张</view>
+    </view>
+
+    <view bindtap="chooseImages" style="border:2rpx dashed #c9cdd4;border-radius:12rpx;padding:20rpx;display:flex;align-items:center;justify-content:center;background:#fafcff;margin-bottom:12rpx;">
+      <image class="icon-sm" src="/assets/icons/upload.svg" mode="aspectFit" />
+    </view>
+
+    <view wx:if="{{imageUrls.length}}" style="display:flex;flex-wrap:wrap;gap:12rpx;margin:8rpx 0 18rpx;">
+      <image wx:for="{{imageUrls}}" wx:key="index" src="{{item}}" mode="aspectFill" style="width:160rpx;height:160rpx;border-radius:10rpx;background:#f2f3f5;" />
+    </view>
+
+    <button class="btn-primary" bindtap="submit" loading="{{loading}}" disabled="{{loading}}">立即发布</button>
+  </view>
+</view>

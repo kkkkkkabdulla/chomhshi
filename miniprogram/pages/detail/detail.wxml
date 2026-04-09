@@ -1,0 +1,57 @@
+<view class="container" wx:if="{{post}}">
+  <view class="card">
+    <view style="font-weight:700; font-size:32rpx; margin-bottom:12rpx;">{{post.title}}</view>
+    <view class="muted" style="margin-bottom:12rpx;">{{post.description || '暂无描述'}}</view>
+
+    <view class="row" style="gap:12rpx;flex-wrap:wrap;margin-bottom:10rpx;">
+      <view class="tag">{{post.type === 1 ? '失物招领' : '二手物品'}}</view>
+      <view class="muted" wx:if="{{post.price !== null && post.price !== undefined}}">价格：￥{{post.price}}</view>
+      <view class="muted" wx:if="{{post.contact}}">联系方式：{{post.contact}}</view>
+    </view>
+
+    <view class="muted">点赞：{{post.likeCount}} ｜ 评论：{{post.commentCount}}</view>
+  </view>
+
+  <view class="card" wx:if="{{imageList.length}}">
+    <view class="section-title">图片</view>
+    <view style="display:flex;flex-wrap:wrap;gap:12rpx;">
+      <image wx:for="{{imageList}}" wx:key="index" src="{{item}}" mode="aspectFill" style="width:30%;height:200rpx;border-radius:10rpx;background:#f2f3f5;" />
+    </view>
+    <view class="muted" style="margin-top:10rpx;">最多展示6张，当前 {{imageList.length}} 张</view>
+  </view>
+
+  <view class="card" style="display:flex; gap: 12rpx; align-items:center;">
+    <view class="heart-container" bindtap="onToggleLike">
+      <image class="heart-icon {{likeAnimating ? 'animate-liked' : ''}}" src="{{liked ? '/assets/icons/like-filled.svg' : '/assets/icons/like.svg'}}" mode="aspectFit" />
+    </view>
+
+    <view class="muted" style="flex:1;display:flex;align-items:center;gap:12rpx;">
+      <text>{{liked ? '已点赞' : '点赞'}}（{{post.likeCount || 0}}）</text>
+      <image class="heart-icon" src="/assets/icons/comment.svg" mode="aspectFit" />
+      <text>评论 {{post.commentCount || 0}}</text>
+    </view>
+    <button size="mini" bindtap="onReport">举报</button>
+  </view>
+
+  <view class="card">
+    <input class="input" placeholder="输入评论后按发送" value="{{commentContent}}" bindinput="onCommentInput" confirm-type="send" bindconfirm="onAddComment" />
+  </view>
+
+  <view class="card" wx:if="{{commentList.length}}">
+    <view class="section-title">评论列表</view>
+    <view wx:for="{{commentList}}" wx:key="id" style="padding: 14rpx 0; border-bottom: 1rpx solid #f2f3f5;">
+      <view class="row" style="gap:10rpx;align-items:center;margin-bottom:8rpx;">
+        <image src="{{item.avatarUrl || 'https://via.placeholder.com/88x88.png?text=U'}}" mode="aspectFill" style="width:44rpx;height:44rpx;border-radius:50%;background:#f2f3f5;" />
+        <view style="font-weight:600;">{{item.nickname || ('用户' + item.userId)}}</view>
+      </view>
+      <view>{{item.content}}</view>
+      <view class="muted" style="margin-top:6rpx;">#{{item.id}} {{item.createTime}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{!commentList.length}}" class="muted" style="text-align:center;">暂无评论</view>
+</view>
+
+<view wx:else class="container">
+  <view class="card muted" style="text-align:center;">加载中...</view>
+</view>

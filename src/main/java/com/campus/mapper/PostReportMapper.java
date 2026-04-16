@@ -17,7 +17,15 @@ public interface PostReportMapper {
 
     PostReport findById(@Param("id") Integer id);
 
+    int countByPostAndUser(@Param("postId") Integer postId,
+                           @Param("userId") Integer userId);
+
+    int countPendingByPostId(@Param("postId") Integer postId);
+
     int updateHandle(@Param("id") Integer id,
                      @Param("status") Integer status,
+                     @Param("adminRemark") String adminRemark,
                      @Param("adminId") Integer adminId);
+
+    List<PostReport> findPendingByPostId(@Param("postId") Integer postId);
 }

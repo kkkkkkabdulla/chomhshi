@@ -6,6 +6,7 @@ import com.campus.service.AdminService;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,11 +21,32 @@ public class AdminTokenInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String token = request.getHeader("token");
         if (token == null || token.trim().isEmpty()) {
+            token = request.getParameter("t");
+        }
+        if (token == null || token.trim().isEmpty()) {
+            token = getCookieValue(request, "adminToken");
+        }
+
+        if (token == null || token.trim().isEmpty()) {
             response.setStatus(ResultCode.UNAUTHORIZED.getCode());
             return false;
         }
+
         Admin admin = adminService.verifyToken(token);
         request.setAttribute(CURRENT_ADMIN_ATTR, admin);
         return true;
+    }
+
+    private String getCookieValue(HttpServletRequest request, String name) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || cookies.length == 0) {
+            return null;
+        }
+        for (Cookie cookie : cookies) {
+            if (name.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 }

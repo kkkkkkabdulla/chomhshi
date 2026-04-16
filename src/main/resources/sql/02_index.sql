@@ -30,8 +30,9 @@ ALTER TABLE `post_comment`
 
 ALTER TABLE `post_report`
   ADD INDEX `idx_report_post_id` (`post_id`),
-  ADD INDEX `idx_report_user_id` (`user_id`),
-  ADD INDEX `idx_report_status` (`status`);
+  ADD INDEX `idx_report_reporter_id` (`reporter_id`),
+  ADD INDEX `idx_report_status` (`status`),
+  ADD INDEX `idx_report_created_at` (`created_at`);
 
 ALTER TABLE `sensitive_word`
   ADD UNIQUE KEY `uk_sensitive_word` (`word`);

@@ -154,14 +154,40 @@ public class AdminServiceImpl implements AdminService {
         if (report == null) {
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "举报记录不存在");
         }
+        if (report.getStatus() != null && report.getStatus() != 0) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "该举报已处理");
+        }
+        handleReportByPost(adminId, report.getPostId(), req);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void handleReportByPost(Integer adminId, Integer postId, AdminHandleReportReq req) {
+        Post post = requirePost(postId);
+        List<PostReport> pendingReports = postReportMapper.findPendingByPostId(postId);
+        if (pendingReports == null || pendingReports.isEmpty()) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "该帖子暂无待处理举报");
+        }
 
         String action = req.getAction() == null ? "" : req.getAction().trim();
-        if ("通过".equals(action)) {
-            postReportMapper.updateHandle(reportId, 1, adminId);
-        } else if ("拒绝".equals(action)) {
-            postReportMapper.updateHandle(reportId, 2, adminId);
+        Integer handleStatus;
+        if ("违规，下架".equals(action)) {
+            handleStatus = 1;
+        } else if ("不违规，驳回".equals(action)) {
+            handleStatus = 2;
         } else {
-            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "action 仅支持：通过/拒绝");
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "action 仅支持：违规，下架/不违规，驳回");
+        }
+
+        for (PostReport report : pendingReports) {
+            int rows = postReportMapper.updateHandle(report.getId(), handleStatus, req.getAdminRemark(), adminId);
+            if (rows <= 0) {
+                throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "处理失败");
+            }
+        }
+
+        if (handleStatus == 1 && (post.getStatus() == null || post.getStatus() != 3)) {
+            postMapper.updateStatus(post.getId(), 3);
         }
     }
 
@@ -170,6 +196,23 @@ public class AdminServiceImpl implements AdminService {
     public void restorePost(Integer adminId, Integer postId) {
         requirePost(postId);
         postMapper.updateStatus(postId, 1);
+    }
+
+    @Override
+    public Post postDetail(Integer postId) {
+        return requirePost(postId);
+    }
+
+    @Override
+    public Post postDetailByReport(Integer reportId) {
+        PostReport report = postReportMapper.findById(reportId);
+        if (report == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "举报记录不存在");
+        }
+        if (report.getPostId() == null || report.getPostId() <= 0) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "举报记录缺少有效帖子ID");
+        }
+        return requirePost(report.getPostId());
     }
 
     private Post requirePost(Integer postId) {

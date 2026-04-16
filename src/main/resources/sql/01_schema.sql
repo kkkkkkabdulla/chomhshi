@@ -90,15 +90,16 @@ CREATE TABLE IF NOT EXISTS `post_comment` (
 
 CREATE TABLE IF NOT EXISTS `post_report` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
-  `post_id` INT NOT NULL,
-  `user_id` INT NOT NULL,
-  `reason` VARCHAR(100),
-  `description` TEXT,
-  `status` TINYINT DEFAULT 0 COMMENT '0待处理 1通过 2拒绝',
-  `admin_id` INT,
-  `handle_time` DATETIME,
-  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='举报表';
+  `reporter_id` INT NOT NULL COMMENT '举报人ID',
+  `post_id` INT NOT NULL COMMENT '被举报帖子ID',
+  `reason_type` TINYINT NOT NULL COMMENT '举报原因类型：1违规内容 2广告骚扰 3色情低俗 4其他',
+  `reason_desc` VARCHAR(500) COMMENT '举报补充描述',
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT '0待处理 1违规成立 2驳回',
+  `admin_remark` VARCHAR(200) COMMENT '管理员处理备注',
+  `handled_by` INT COMMENT '处理管理员ID',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `handled_at` DATETIME NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='帖子举报表';
 
 CREATE TABLE IF NOT EXISTS `sensitive_word` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,

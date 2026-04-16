@@ -45,9 +45,9 @@
     </view>
 
     <view style="display:flex;gap:18rpx;align-items:center;margin-top:12rpx;" class="muted">
-      <view class="icon-text">
-        <image class="icon-lg" src="/assets/icons/like.svg" mode="aspectFit" />
-        <text>{{item.likeCount}}</text>
+      <view class="icon-text" catchtap="onToggleLike" data-id="{{item.id}}" style="padding:6rpx 10rpx;border-radius:999rpx;background:{{item.liked ? '#fff1f0' : '#f5f7fa'}};opacity:{{item.liking ? 0.6 : 1}};">
+        <image class="icon-lg" src="{{item.liked ? '/assets/icons/like-filled.svg' : '/assets/icons/like.svg'}}" mode="aspectFit" />
+        <text style="color:{{item.liked ? '#ff4d4f' : '#667085'}};">{{item.likeCount}}</text>
       </view>
       <view class="icon-text">
         <image class="icon-lg" src="/assets/icons/comment.svg" mode="aspectFit" />

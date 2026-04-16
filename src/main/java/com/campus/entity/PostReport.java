@@ -5,14 +5,22 @@ import java.util.Date;
 public class PostReport {
 
     private Integer id;
+    private Integer reporterId;
     private Integer postId;
-    private Integer userId;
-    private String reason;
-    private String description;
+    private Integer reasonType;
+    private String reasonDesc;
     private Integer status;
-    private Integer adminId;
-    private Date handleTime;
-    private Date createTime;
+    private String adminRemark;
+    private Integer handledBy;
+    private Date createdAt;
+    private Date handledAt;
+
+    // 管理端展示字段（联表查询）
+    private String reporterNickname;
+    private String postTitle;
+    private String postDescription;
+    private Integer postStatus;
+    private String handledAdminName;
 
     public Integer getId() {
         return id;
@@ -20,6 +28,14 @@ public class PostReport {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getReporterId() {
+        return reporterId;
+    }
+
+    public void setReporterId(Integer reporterId) {
+        this.reporterId = reporterId;
     }
 
     public Integer getPostId() {
@@ -30,28 +46,20 @@ public class PostReport {
         this.postId = postId;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Integer getReasonType() {
+        return reasonType;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setReasonType(Integer reasonType) {
+        this.reasonType = reasonType;
     }
 
-    public String getReason() {
-        return reason;
+    public String getReasonDesc() {
+        return reasonDesc;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setReasonDesc(String reasonDesc) {
+        this.reasonDesc = reasonDesc;
     }
 
     public Integer getStatus() {
@@ -62,27 +70,75 @@ public class PostReport {
         this.status = status;
     }
 
-    public Integer getAdminId() {
-        return adminId;
+    public String getAdminRemark() {
+        return adminRemark;
     }
 
-    public void setAdminId(Integer adminId) {
-        this.adminId = adminId;
+    public void setAdminRemark(String adminRemark) {
+        this.adminRemark = adminRemark;
     }
 
-    public Date getHandleTime() {
-        return handleTime;
+    public Integer getHandledBy() {
+        return handledBy;
     }
 
-    public void setHandleTime(Date handleTime) {
-        this.handleTime = handleTime;
+    public void setHandledBy(Integer handledBy) {
+        this.handledBy = handledBy;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getHandledAt() {
+        return handledAt;
+    }
+
+    public void setHandledAt(Date handledAt) {
+        this.handledAt = handledAt;
+    }
+
+    public String getReporterNickname() {
+        return reporterNickname;
+    }
+
+    public void setReporterNickname(String reporterNickname) {
+        this.reporterNickname = reporterNickname;
+    }
+
+    public String getPostTitle() {
+        return postTitle;
+    }
+
+    public void setPostTitle(String postTitle) {
+        this.postTitle = postTitle;
+    }
+
+    public String getPostDescription() {
+        return postDescription;
+    }
+
+    public void setPostDescription(String postDescription) {
+        this.postDescription = postDescription;
+    }
+
+    public Integer getPostStatus() {
+        return postStatus;
+    }
+
+    public void setPostStatus(Integer postStatus) {
+        this.postStatus = postStatus;
+    }
+
+    public String getHandledAdminName() {
+        return handledAdminName;
+    }
+
+    public void setHandledAdminName(String handledAdminName) {
+        this.handledAdminName = handledAdminName;
     }
 }

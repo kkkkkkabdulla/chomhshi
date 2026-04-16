@@ -27,7 +27,7 @@
             <mvc:mapping path="/api/**"/>
             <mvc:exclude-mapping path="/api/ping"/>
             <mvc:exclude-mapping path="/api/user/wxLogin"/>
-            <mvc:exclude-mapping path="/api/admin/login"/>
+            <mvc:exclude-mapping path="/api/admin/**"/>
             <mvc:exclude-mapping path="/api/upload/file/**"/>
             <mvc:exclude-mapping path="/api/post/list"/>
             <mvc:exclude-mapping path="/api/post/detail/**"/>

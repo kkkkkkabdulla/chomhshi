@@ -5,45 +5,113 @@
 <mapper namespace="com.campus.mapper.PostReportMapper">
 
     <insert id="insert" parameterType="com.campus.entity.PostReport" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO post_report(post_id, user_id, reason, description, status)
-        VALUES(#{postId}, #{userId}, #{reason}, #{description}, #{status})
+        INSERT INTO post_report(reporter_id, post_id, reason_type, reason_desc, status)
+        VALUES(#{reporterId}, #{postId}, #{reasonType}, #{reasonDesc}, #{status})
     </insert>
 
     <select id="findByStatus" resultType="com.campus.entity.PostReport">
-        SELECT id, post_id, user_id, reason, description, status, admin_id, handle_time, create_time
-        FROM post_report
+        SELECT r.id AS id,
+               r.reporter_id AS reporterId,
+               r.post_id AS postId,
+               r.reason_type AS reasonType,
+               r.reason_desc AS reasonDesc,
+               r.status AS status,
+               r.admin_remark AS adminRemark,
+               r.handled_by AS handledBy,
+               r.created_at AS createdAt,
+               r.handled_at AS handledAt,
+               u.nickname AS reporterNickname,
+               p.title AS postTitle,
+               p.description AS postDescription,
+               p.status AS postStatus,
+               a.username AS handledAdminName
+        FROM post_report r
+        LEFT JOIN user u ON u.id = r.reporter_id
+        LEFT JOIN post p ON p.id = r.post_id
+        LEFT JOIN admin a ON a.id = r.handled_by
         <where>
             <if test="status != null">
-                status = #{status}
+                r.status = #{status}
             </if>
         </where>
-        ORDER BY id DESC
+        ORDER BY r.created_at DESC, r.id DESC
         LIMIT #{offset}, #{pageSize}
     </select>
 
     <select id="countByStatus" resultType="long">
         SELECT COUNT(1)
-        FROM post_report
+        FROM post_report r
         <where>
             <if test="status != null">
-                status = #{status}
+                r.status = #{status}
             </if>
         </where>
     </select>
 
     <select id="findById" resultType="com.campus.entity.PostReport">
-        SELECT id, post_id, user_id, reason, description, status, admin_id, handle_time, create_time
+        SELECT id AS id,
+               reporter_id AS reporterId,
+               post_id AS postId,
+               reason_type AS reasonType,
+               reason_desc AS reasonDesc,
+               status AS status,
+               admin_remark AS adminRemark,
+               handled_by AS handledBy,
+               created_at AS createdAt,
+               handled_at AS handledAt
         FROM post_report
         WHERE id = #{id}
         LIMIT 1
     </select>
 
+    <select id="countByPostAndUser" resultType="int">
+        SELECT COUNT(1)
+        FROM post_report
+        WHERE post_id = #{postId}
+          AND reporter_id = #{userId}
+          AND status = 0
+    </select>
+
+    <select id="countPendingByPostId" resultType="int">
+        SELECT COUNT(1)
+        FROM post_report
+        WHERE post_id = #{postId}
+          AND status = 0
+    </select>
+
+    <select id="findPendingByPostId" resultType="com.campus.entity.PostReport">
+        SELECT r.id AS id,
+               r.reporter_id AS reporterId,
+               r.post_id AS postId,
+               r.reason_type AS reasonType,
+               r.reason_desc AS reasonDesc,
+               r.status AS status,
+               r.admin_remark AS adminRemark,
+               r.handled_by AS handledBy,
+               r.created_at AS createdAt,
+               r.handled_at AS handledAt,
+               u.nickname AS reporterNickname,
+               p.title AS postTitle,
+               p.description AS postDescription,
+               p.status AS postStatus,
+               a.username AS handledAdminName
+        FROM post_report r
+        LEFT JOIN user u ON u.id = r.reporter_id
+        LEFT JOIN post p ON p.id = r.post_id
+        LEFT JOIN admin a ON a.id = r.handled_by
+        WHERE r.post_id = #{postId}
+          AND r.status = 0
+        ORDER BY r.created_at DESC, r.id DESC
+    </select>
+
     <update id="updateHandle">
         UPDATE post_report
         SET status = #{status},
-            admin_id = #{adminId},
-            handle_time = NOW()
+            admin_remark = #{adminRemark},
+            handled_by = #{adminId},
+            handled_at = NOW()
         WHERE id = #{id}
+          AND status = 0
     </update>
 
 </mapper>

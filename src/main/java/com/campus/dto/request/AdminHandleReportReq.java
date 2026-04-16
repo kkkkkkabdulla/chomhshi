@@ -10,7 +10,7 @@ public class AdminHandleReportReq {
     private String action;
 
     @Length(max = 200, message = "处理备注长度不能超过200")
-    private String reason;
+    private String adminRemark;
 
     public String getAction() {
         return action;
@@ -20,11 +20,11 @@ public class AdminHandleReportReq {
         this.action = action;
     }
 
-    public String getReason() {
-        return reason;
+    public String getAdminRemark() {
+        return adminRemark;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
+    public void setAdminRemark(String adminRemark) {
+        this.adminRemark = adminRemark;
     }
 }

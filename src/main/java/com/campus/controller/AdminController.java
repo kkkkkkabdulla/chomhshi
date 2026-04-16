@@ -95,10 +95,29 @@ public class AdminController {
         return Result.success("处理成功", null);
     }
 
+    @PostMapping("/post/handleReportByPost/{postId}")
+    public Result<Void> handleReportByPost(@PathVariable("postId") Integer postId,
+                                            @Valid @RequestBody AdminHandleReportReq req,
+                                            HttpServletRequest request) {
+        Admin admin = (Admin) request.getAttribute(AdminTokenInterceptor.CURRENT_ADMIN_ATTR);
+        adminService.handleReportByPost(admin.getId(), postId, req);
+        return Result.success("处理成功", null);
+    }
+
     @PostMapping("/post/restore/{id}")
     public Result<Void> restore(@PathVariable("id") Integer id, HttpServletRequest request) {
         Admin admin = (Admin) request.getAttribute(AdminTokenInterceptor.CURRENT_ADMIN_ATTR);
         adminService.restorePost(admin.getId(), id);
         return Result.success("已恢复", null);
+    }
+
+    @GetMapping("/post/detail/{id}")
+    public Result<Post> postDetail(@PathVariable("id") Integer id) {
+        return Result.success(adminService.postDetail(id));
+    }
+
+    @GetMapping("/post/detailByReport/{reportId}")
+    public Result<Post> postDetailByReport(@PathVariable("reportId") Integer reportId) {
+        return Result.success(adminService.postDetailByReport(reportId));
     }
 }

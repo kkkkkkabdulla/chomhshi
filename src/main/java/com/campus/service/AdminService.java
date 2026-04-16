@@ -27,5 +27,11 @@ public interface AdminService {
 
     void handleReport(Integer adminId, Integer reportId, AdminHandleReportReq req);
 
+    void handleReportByPost(Integer adminId, Integer postId, AdminHandleReportReq req);
+
     void restorePost(Integer adminId, Integer postId);
+
+    Post postDetail(Integer postId);
+
+    Post postDetailByReport(Integer reportId);
 }

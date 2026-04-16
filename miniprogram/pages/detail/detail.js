@@ -98,15 +98,24 @@ Page({
   },
 
   async onReport() {
-    const reasons = ['虚假信息', '违规内容', '广告骚扰', '其他'];
+    const reasons = [
+      { text: '违规内容', value: 1 },
+      { text: '广告骚扰', value: 2 },
+      { text: '色情低俗', value: 3 },
+      { text: '其他', value: 4 }
+    ];
     try {
-      const tap = await showActionSheetAsync(reasons);
-      const reason = reasons[tap.tapIndex];
-      if (!reason) return;
+      const tap = await showActionSheetAsync(reasons.map((r) => r.text));
+      const selected = reasons[tap.tapIndex];
+      if (!selected) return;
+
+      const desc = await showReportDescInput();
+      if (desc === null) return;
+
       await api.addReport({
         postId: this.data.id,
-        reason,
-        description: ''
+        reasonType: selected.value,
+        reasonDesc: desc
       });
       wx.showToast({ title: '举报已提交', icon: 'success' });
     } catch (e) {}
@@ -135,6 +144,24 @@ function showActionSheetAsync(itemList) {
       itemList,
       success: resolve,
       fail: reject
+    });
+  });
+}
+
+function showReportDescInput() {
+  return new Promise((resolve) => {
+    wx.showModal({
+      title: '补充描述（可选）',
+      editable: true,
+      placeholderText: '请输入举报补充说明',
+      success: (res) => {
+        if (!res.confirm) {
+          resolve(null);
+          return;
+        }
+        resolve((res.content || '').trim());
+      },
+      fail: () => resolve('')
     });
   });
 }

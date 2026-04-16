@@ -52,18 +52,68 @@ Page({
         category
       });
 
-      const list = ((res.data && res.data.list) || []).map((item) => {
+      let list = ((res.data && res.data.list) || []).map((item) => {
         const imageList = parseImages(item.images).slice(0, 3);
         return {
           ...item,
           imageList,
-          summary: pickSummary(item.description)
+          summary: pickSummary(item.description),
+          liked: false,
+          liking: false
         };
       });
+
+      if (hasLoginToken() && list.length) {
+        list = await fillLikedState(list);
+      }
+
       this.setData({ list });
     } catch (e) {
       console.error('loadList error:', e);
       this.setData({ list: [] });
+    }
+  },
+
+  async onToggleLike(e) {
+    const id = Number(e.currentTarget.dataset.id);
+    if (!id) return;
+
+    const currentList = this.data.list || [];
+    const target = currentList.find((item) => Number(item.id) === id);
+    if (!target || target.liking) return;
+
+    const markLoadingList = currentList.map((item) =>
+      Number(item.id) === id ? { ...item, liking: true } : item
+    );
+    this.setData({ list: markLoadingList });
+
+    try {
+      const res = await api.toggleLike(id);
+      const liked = !!(res.data && res.data.liked);
+      const likeCount = Number((res.data && res.data.likeCount) || 0);
+
+      const list = (this.data.list || []).map((item) => {
+        if (Number(item.id) !== id) return item;
+        return {
+          ...item,
+          liked,
+          likeCount,
+          liking: false
+        };
+      });
+
+      this.setData({ list });
+      wx.showToast({
+        title: liked ? '已点赞' : '已取消点赞',
+        icon: 'none',
+        duration: 800
+      });
+    } catch (e) {
+      const rollbackList = (this.data.list || []).map((item) =>
+        Number(item.id) === id ? { ...item, liking: false } : item
+      );
+      this.setData({ list: rollbackList });
+      // 401 等错误由 request.js 统一处理
     }
   },
 
@@ -97,4 +147,24 @@ function parseImages(images) {
   } catch (e) {
     return text.split(',').map((s) => s.trim()).filter(Boolean);
   }
+}
+
+function hasLoginToken() {
+  return !!wx.getStorageSync('token');
+}
+
+async function fillLikedState(list) {
+  const jobs = list.map(async (item) => {
+    try {
+      const res = await api.isLiked(item.id);
+      return {
+        ...item,
+        liked: !!(res.data && res.data.liked)
+      };
+    } catch (e) {
+      return item;
+    }
+  });
+
+  return Promise.all(jobs);
 }

@@ -4,13 +4,12 @@ Page({
   data: {
     currentType: 2, // 2 二手物品，1 失物招领
     categoryTabs: [
-      { label: '二手', value: '二手' },
-      { label: '失物', value: '失物' },
-      { label: '随心贴', value: '随心贴' },
-      { label: '互助', value: '互助' },
-      { label: '公告', value: '公告' }
+      { label: '二手物品', value: '二手物品', type: 2 },
+      { label: '失物招领', value: '失物招领', type: 1 },
+      { label: '随心贴', value: '随心贴', type: 3 },
+      { label: '互助', value: '互助', type: 3 }
     ],
-    activeCategory: '二手',
+    activeCategory: '二手物品',
     form: {
       title: '',
       description: '',
@@ -34,6 +33,16 @@ Page({
     });
   },
 
+  onCategorySelect(e) {
+    const value = e.currentTarget.dataset.value;
+    const selected = this.data.categoryTabs.find((it) => it.value === value);
+    if (!selected) return;
+    this.setData({
+      activeCategory: selected.value,
+      currentType: Number(selected.type || 3)
+    });
+  },
+
   onInput(e) {
     const key = e.currentTarget.dataset.key;
     const value = e.detail.value || '';
@@ -45,11 +54,6 @@ Page({
     });
   },
 
-  onCategorySelect(e) {
-    const value = e.currentTarget.dataset.value;
-    if (!value) return;
-    this.setData({ activeCategory: value });
-  },
 
   async chooseImages() {
     try {
@@ -96,7 +100,12 @@ Page({
       wx.showToast({ title: '请填写价格', icon: 'none' });
       return;
     }
-    if (!f.contact.trim()) {
+
+    if (type === 1 && !f.contact.trim()) {
+      wx.showToast({ title: '请填写联系方式', icon: 'none' });
+      return;
+    }
+    if (type === 2 && !f.contact.trim()) {
       wx.showToast({ title: '请填写联系方式', icon: 'none' });
       return;
     }
@@ -110,7 +119,7 @@ Page({
       images: JSON.stringify(this.data.imageUrls),
       contact: f.contact.trim(),
       location: null,
-      lostFoundTime: null,
+      lostFoundTime: type === 1 ? null : null,
       lostStatus: type === 1 ? 1 : null
     };
 

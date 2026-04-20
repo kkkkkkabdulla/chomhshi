@@ -15,9 +15,8 @@
   <view class="card" wx:if="{{imageList.length}}">
     <view class="section-title">图片</view>
     <view style="display:flex;flex-wrap:wrap;gap:12rpx;">
-      <image wx:for="{{imageList}}" wx:key="index" src="{{item}}" mode="aspectFill" style="width:30%;height:200rpx;border-radius:10rpx;background:#f2f3f5;" />
+      <image wx:for="{{imageList}}" wx:key="index" src="{{item}}" mode="aspectFill" style="width:30%;height:200rpx;border-radius:10rpx;background:#f2f3f5;" bindtap="previewImage" data-index="{{index}}" />
     </view>
-    <view class="muted" style="margin-top:10rpx;">最多展示6张，当前 {{imageList.length}} 张</view>
   </view>
 
   <view class="card" style="display:flex; gap: 12rpx; align-items:center;">

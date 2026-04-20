@@ -37,7 +37,7 @@ Page({
       const res = await api.getPostDetail(this.data.id);
       const post = res.data || null;
       const imageList = parseImages(post && post.images).slice(0, 6);
-      this.setData({ post, imageList });
+      this.setData({ post, imageList, imagePreviewList: imageList });
     } catch (e) {}
   },
 
@@ -119,6 +119,16 @@ Page({
       });
       wx.showToast({ title: '举报已提交', icon: 'success' });
     } catch (e) {}
+  },
+
+  previewImage(e) {
+    const index = Number(e.currentTarget.dataset.index || 0);
+    const urls = this.data.imageList || [];
+    if (!urls.length) return;
+    wx.previewImage({
+      current: urls[index] || urls[0],
+      urls
+    });
   }
 });
 

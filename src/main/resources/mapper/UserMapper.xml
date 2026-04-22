@@ -38,7 +38,8 @@
     <update id="updateUserInfoById">
         UPDATE user
         SET nickname = #{nickname},
-            avatar_url = #{avatarUrl}
+            avatar_url = #{avatarUrl},
+            phone = #{phone}
         WHERE id = #{id}
     </update>
 

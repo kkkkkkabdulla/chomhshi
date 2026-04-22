@@ -54,6 +54,13 @@ Page({
     });
   },
 
+  removeImage(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(index) || index < 0) return;
+    const next = this.data.imageUrls.slice();
+    next.splice(index, 1);
+    this.setData({ imageUrls: next });
+  },
 
   async chooseImages() {
     try {
@@ -86,6 +93,10 @@ Page({
     if (this.data.loading) return;
 
     const type = this.data.currentType;
+    if (!type || ![1, 2, 3].includes(type)) {
+      wx.showToast({ title: '请选择分类', icon: 'none' });
+      return;
+    }
     const f = this.data.form;
 
     if (!f.title.trim()) {

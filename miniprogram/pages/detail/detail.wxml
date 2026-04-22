@@ -1,7 +1,13 @@
 <view class="container" wx:if="{{post}}">
   <view class="card">
-    <view style="font-weight:700; font-size:32rpx; margin-bottom:12rpx;">{{post.title}}</view>
-    <view class="muted" style="margin-bottom:12rpx;">{{post.description || '暂无描述'}}</view>
+    <view style="font-weight:800; font-size:36rpx; margin-bottom:14rpx; color:#1f2d3d;">{{post.title}}</view>
+    <view wx:if="{{post.status === 0 || post.status === 3}}" style="margin-bottom:12rpx;padding:12rpx 16rpx;border-radius:12rpx;background:#fff7e6;border:1rpx solid #ffd591;color:#ad6800;font-weight:700;">该帖子因违规已下架，不可点赞评论</view>
+    <view wx:if="{{post.status === 3}}" style="margin-bottom:12rpx;padding:12rpx 16rpx;border-radius:12rpx;background:#fff5f5;border:1rpx solid #ffd6d6;color:#d4380d;font-weight:700;">已被下架</view>
+    <view wx:if="{{post.status === 0}}" style="margin-bottom:12rpx;padding:12rpx 16rpx;border-radius:12rpx;background:#fffbe6;border:1rpx solid #ffe58f;color:#ad8b00;font-weight:700;">待审核中，审核通过后可正常互动</view>
+    <view style="background:#f7fbff;border:1rpx solid #d9e8ff;border-radius:16rpx;padding:18rpx 16rpx;margin-bottom:14rpx;">
+      <view style="font-size:24rpx;color:#1677ff;font-weight:700;margin-bottom:8rpx;">描述</view>
+      <view style="font-size:28rpx;line-height:1.7;color:#2c3e50;white-space:pre-wrap;">{{post.description || '暂无描述'}}</view>
+    </view>
 
     <view class="row" style="gap:12rpx;flex-wrap:wrap;margin-bottom:10rpx;">
       <view class="tag">{{post.type === 1 ? '失物招领' : '二手物品'}}</view>
@@ -9,7 +15,6 @@
       <view class="muted" wx:if="{{post.contact}}">联系方式：{{post.contact}}</view>
     </view>
 
-    <view class="muted">点赞：{{post.likeCount}} ｜ 评论：{{post.commentCount}}</view>
   </view>
 
   <view class="card" wx:if="{{imageList.length}}">
@@ -19,7 +24,7 @@
     </view>
   </view>
 
-  <view class="card" style="display:flex; gap: 12rpx; align-items:center;">
+  <view wx:if="{{post.status !== 0 && post.status !== 3}}" class="card" style="display:flex; gap: 12rpx; align-items:center;">
     <view class="heart-container" bindtap="onToggleLike">
       <image class="heart-icon {{likeAnimating ? 'animate-liked' : ''}}" src="{{liked ? '/assets/icons/like-filled.svg' : '/assets/icons/like.svg'}}" mode="aspectFit" />
     </view>
@@ -32,7 +37,7 @@
     <button size="mini" bindtap="onReport">举报</button>
   </view>
 
-  <view class="card">
+  <view wx:if="{{post.status !== 0 && post.status !== 3}}" class="card">
     <input class="input" placeholder="输入评论后按发送" value="{{commentContent}}" bindinput="onCommentInput" confirm-type="send" bindconfirm="onAddComment" />
   </view>
 

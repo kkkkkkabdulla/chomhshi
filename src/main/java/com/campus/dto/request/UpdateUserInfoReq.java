@@ -14,6 +14,10 @@ public class UpdateUserInfoReq {
     @Length(max = 255, message = "头像地址长度不能超过255")
     private String avatarUrl;
 
+    @NotBlank(message = "手机号不能为空")
+    @Length(max = 20, message = "手机号长度不能超过20")
+    private String phone;
+
     public String getNickname() {
         return nickname;
     }
@@ -28,5 +32,13 @@ public class UpdateUserInfoReq {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

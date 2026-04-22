@@ -16,6 +16,8 @@ public interface PostService {
 
     Post detail(Integer id);
 
+    Post detailForOwner(Integer userId, Integer id);
+
     void update(Integer userId, Integer postId, PostPublishReq req);
 
     void delete(Integer userId, Integer postId);

@@ -13,5 +13,6 @@ public interface UserMapper {
 
     int updateUserInfoById(@Param("id") Integer id,
                            @Param("nickname") String nickname,
-                           @Param("avatarUrl") String avatarUrl);
+                           @Param("avatarUrl") String avatarUrl,
+                           @Param("phone") String phone);
 }

@@ -13,7 +13,7 @@ public class PostPublishReq {
 
     @NotNull(message = "帖子类型不能为空")
     @Min(value = 1, message = "帖子类型错误")
-    @Max(value = 2, message = "帖子类型错误")
+    @Max(value = 3, message = "帖子类型错误")
     private Integer type;
 
     @NotBlank(message = "标题不能为空")

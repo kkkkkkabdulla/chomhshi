@@ -62,6 +62,12 @@ public class PostController {
         return Result.success(postService.detail(id));
     }
 
+    @GetMapping("/detailForOwner/{id}")
+    public Result<Post> detailForOwner(@PathVariable("id") Integer id, HttpServletRequest request) {
+        User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
+        return Result.success(postService.detailForOwner(user.getId(), id));
+    }
+
     @PutMapping("/update/{id}")
     public Result<Void> update(@PathVariable("id") Integer id,
                                @Valid @RequestBody PostPublishReq req,

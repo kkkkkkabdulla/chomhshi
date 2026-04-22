@@ -1,27 +1,31 @@
 <view class="container">
+
   <view class="card">
     <view class="section-title">发布动态</view>
 
-    <view class="muted" style="margin-bottom:10rpx;">请选择分类（必选）</view>
-    <view class="row" style="gap:14rpx;flex-wrap:wrap;margin-bottom:18rpx;">
-      <view
-        wx:for="{{categoryTabs}}"
-        wx:key="value"
-        class="tag"
-        style="padding:10rpx 16rpx;font-size:26rpx;background:{{activeCategory === item.value ? '#e8f3ff' : '#f7f8fa'}};"
-        data-value="{{item.value}}"
-        bindtap="onCategorySelect"
-      >
-        <text style="color: {{activeCategory === item.value ? '#1677ff' : '#4e5969'}};font-weight:{{activeCategory === item.value ? '700' : '500'}};">{{item.label}}</text>
+    <view style="margin-bottom:12rpx;">
+      <view style="font-size:26rpx;font-weight:700;color:#1f2d3d;margin-bottom:10rpx;">请选择分类（必选）</view>
+      <view class="row" style="gap:12rpx;flex-wrap:wrap;">
+        <view
+          wx:for="{{categoryTabs}}"
+          wx:key="value"
+          data-value="{{item.value}}"
+          bindtap="onCategorySelect"
+          style="padding:14rpx 22rpx;border-radius:999rpx;border:1rpx solid {{activeCategory === item.value ? '#1677ff' : '#d9e8ff'}};background:{{activeCategory === item.value ? 'linear-gradient(135deg, #1677ff, #4da3ff)' : '#f7fbff'}};box-shadow:{{activeCategory === item.value ? '0 8rpx 20rpx rgba(22,119,255,.22)' : '0 4rpx 12rpx rgba(22,119,255,.06)'}};transform:{{activeCategory === item.value ? 'translateY(-1rpx)' : 'none'}};"
+        >
+          <text style="color:{{activeCategory === item.value ? '#fff' : '#2f6fd6'}};font-weight:700;font-size:26rpx;">{{item.label}}</text>
+        </view>
       </view>
     </view>
 
-    <view class="muted" style="margin-bottom:10rpx;">当前发布类型：{{currentType === 2 ? '二手物品' : currentType === 1 ? '失物招领' : '通用帖子'}}</view>
 
     <input class="input" placeholder="标题" value="{{form.title}}" data-key="title" bindinput="onInput" />
     <view style="margin: 10rpx 0 14rpx; background:#f7fbff; border:1rpx solid #d9e8ff; border-radius:16rpx; padding:18rpx; box-shadow:0 6rpx 20rpx rgba(22,119,255,.06);">
-      <view class="muted" style="margin-bottom:8rpx; font-size:24rpx; color:#1677ff; font-weight:600;">描述内容</view>
-      <textarea class="input" style="min-height:220rpx; line-height:1.6; font-size:28rpx; background:#fff; border:1rpx solid #cfe0ff; border-radius:14rpx; padding:16rpx; box-sizing:border-box;" placeholder="请详细描述你的帖子内容，越清楚越容易被看到" value="{{form.description}}" data-key="description" bindinput="onInput" />
+      <view style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8rpx;">
+        <view style="font-size:24rpx;color:#1677ff;font-weight:700;">描述内容</view>
+        <view style="font-size:22rpx;color:#7f8b99;">{{form.description.length || 0}} / 500</view>
+      </view>
+      <textarea class="input" maxlength="500" style="min-height:260rpx; line-height:1.7; font-size:28rpx; background:#fff; border:1rpx solid #cfe0ff; border-radius:14rpx; padding:16rpx; box-sizing:border-box;" placeholder="请详细描述你的帖子内容，越清楚越容易被看到" value="{{form.description}}" data-key="description" bindinput="onInput" />
     </view>
 
     <view wx:if="{{currentType === 2}}">
@@ -43,7 +47,10 @@
     </view>
 
     <view wx:if="{{imageUrls.length}}" style="display:flex;flex-wrap:wrap;gap:12rpx;margin:8rpx 0 18rpx;">
-      <image wx:for="{{imageUrls}}" wx:key="index" src="{{item}}" mode="aspectFill" style="width:160rpx;height:160rpx;border-radius:10rpx;background:#f2f3f5;" bindtap="previewImage" data-index="{{index}}" />
+      <view wx:for="{{imageUrls}}" wx:key="index" style="position:relative;width:160rpx;height:160rpx;">
+        <image src="{{item}}" mode="aspectFill" style="width:160rpx;height:160rpx;border-radius:14rpx;background:#f2f3f5;" bindtap="previewImage" data-index="{{index}}" />
+        <view bindtap="removeImage" data-index="{{index}}" style="position:absolute;right:8rpx;top:8rpx;width:36rpx;height:36rpx;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24rpx;line-height:1;">×</view>
+      </view>
     </view>
 
     <button class="btn-primary" bindtap="submit" loading="{{loading}}" disabled="{{loading}}">立即发布</button>

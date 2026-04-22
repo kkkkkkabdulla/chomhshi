@@ -48,6 +48,12 @@ function getPostDetail(id) {
   });
 }
 
+function getPostDetailForOwner(id) {
+  return request({
+    url: `/api/post/detailForOwner/${id}`
+  });
+}
+
 function getMyPostList(params = {}) {
   const query = toQuery(params);
   return request({ url: `/api/post/myList${query}` });
@@ -114,6 +120,15 @@ function uploadPostImage(filePath) {
   return uploadImage(filePath, true);
 }
 
+function getLatestAnnouncement() {
+  return request({ url: '/api/announcement/latest', needAuth: false });
+}
+
+function getAnnouncementList(params = {}) {
+  const query = toQuery(params);
+  return request({ url: `/api/announcement/list${query}`, needAuth: false });
+}
+
 function toQuery(obj = {}) {
   const arr = Object.keys(obj)
     .filter((k) => obj[k] !== undefined && obj[k] !== null && obj[k] !== '')
@@ -129,6 +144,7 @@ module.exports = {
   publishPost,
   getPostList,
   getPostDetail,
+  getPostDetailForOwner,
   getMyPostList,
   updatePost,
   deletePost,
@@ -138,5 +154,7 @@ module.exports = {
   getCommentList,
   deleteComment,
   addReport,
-  uploadPostImage
+  uploadPostImage,
+  getLatestAnnouncement,
+  getAnnouncementList
 };

@@ -1,4 +1,25 @@
 <view class="container">
+  <view wx:if="{{noticePopupVisible}}" class="notice-mask" bindtap="closeNoticePopup">
+    <view class="notice-modal" catchtap="noop">
+      <view style="display:flex;align-items:center;justify-content:space-between;gap:16rpx;margin-bottom:18rpx;">
+        <view>
+          <view style="font-size:22rpx;color:#1677ff;font-weight:800;letter-spacing:2rpx;">系统通知</view>
+          <view style="font-size:36rpx;font-weight:900;color:#1f2d3d;line-height:1.2;margin-top:6rpx;">公告</view>
+        </view>
+        <view class="notice-close" bindtap="closeNoticePopup">×</view>
+      </view>
+      <view class="notice-head">
+        <view style="display:flex;align-items:center;gap:12rpx;min-width:0;">
+          <view wx:if="{{noticePopup.isLatest}}" style="padding:4rpx 10rpx;border-radius:999rpx;background:#1677ff;color:#fff;font-size:22rpx;font-weight:700;flex-shrink:0;">最新</view>
+          <view style="font-size:32rpx;font-weight:800;color:#1f2d3d;line-height:1.4;" class="text-ellipsis">{{noticePopup.title}}</view>
+        </view>
+      </view>
+      <view class="notice-time">{{noticePopup.createdAtText}}</view>
+      <view class="notice-content" style="max-height:520rpx;overflow:auto;">{{noticePopup.content}}</view>
+      <button class="btn-primary" style="margin-top:16rpx;" bindtap="closeNoticePopup">我知道了</button>
+    </view>
+  </view>
+
   <view class="card" style="padding-bottom:16rpx;">
     <view class="section-title">信息广场</view>
 
@@ -23,6 +44,23 @@
     </view>
 
     <view style="height:1rpx;background:#eceef2;margin:14rpx 0 2rpx;"></view>
+  </view>
+
+  <view wx:if="{{activeTab === 'notice' && noticeList.length}}" class="card" style="padding:18rpx;">
+    <view style="margin-bottom:18rpx;">
+      <view style="font-size:22rpx;color:#1677ff;font-weight:800;letter-spacing:2rpx;">系统通知</view>
+      <view style="font-size:34rpx;font-weight:900;color:#1f2d3d;line-height:1.2;margin-top:4rpx;">公告</view>
+    </view>
+    <view wx:for="{{noticeList}}" wx:key="id" style="padding:14rpx 0;border-bottom:1rpx solid #f2f3f5;{{item.isLatest ? 'background:#f0f7ff;border-radius:12rpx;padding:16rpx;border:1rpx solid #cfe3ff;margin-bottom:12rpx;' : ''}}" bindtap="goNoticeDetail" data-id="{{item.id}}">
+      <view class="row-between" style="margin-bottom:8rpx;gap:10rpx;">
+        <view style="display:flex;align-items:center;gap:10rpx;min-width:0;">
+          <view wx:if="{{item.isLatest}}" style="padding:4rpx 10rpx;border-radius:999rpx;background:#1677ff;color:#fff;font-size:22rpx;font-weight:700;flex-shrink:0;">最新</view>
+          <view style="font-weight:700;font-size:28rpx;max-width:420rpx;" class="text-ellipsis">{{item.title}}</view>
+        </view>
+        <view class="muted">{{item.createdAtText}} · {{item.createdByText}}</view>
+      </view>
+      <view class="muted" style="line-height:1.6;{{item.isLatest ? 'font-weight:600;color:#1f2d3d;' : ''}}">{{item.content}}</view>
+    </view>
   </view>
 
   <view wx:for="{{list}}" wx:key="id" class="card" bindtap="goDetail" data-id="{{item.id}}" style="padding:18rpx;">

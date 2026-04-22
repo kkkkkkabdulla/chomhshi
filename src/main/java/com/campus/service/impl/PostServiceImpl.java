@@ -25,6 +25,7 @@ public class PostServiceImpl implements PostService {
 
     private static final int POST_TYPE_LOST_FOUND = 1;
     private static final int POST_TYPE_SECOND_HAND = 2;
+    private static final int POST_TYPE_ANNOUNCEMENT = 3;
 
     @Resource
     private PostMapper postMapper;
@@ -105,6 +106,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Post detailForOwner(Integer userId, Integer id) {
+        Post post = postMapper.findById(id);
+        if (post == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "帖子不存在");
+        }
+        if (!userId.equals(post.getUserId())) {
+            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权查看他人帖子");
+        }
+        return post;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Integer userId, Integer postId, PostPublishReq req) {
         Post post = requireOwnedPost(userId, postId);
@@ -173,6 +186,13 @@ public class PostServiceImpl implements PostService {
     private void validateTypeSpecificFields(PostPublishReq req) {
         if (req.getType() == null) {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "帖子类型不能为空");
+        }
+
+        if (req.getType() == POST_TYPE_ANNOUNCEMENT) {
+            if (!"公告".equals(req.getCategory())) {
+                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "公告类型的分类必须为公告");
+            }
+            return;
         }
 
         if (isBlank(req.getContact())) {

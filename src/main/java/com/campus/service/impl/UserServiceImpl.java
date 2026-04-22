@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
         }
-        int rows = userMapper.updateUserInfoById(userId, req.getNickname(), req.getAvatarUrl());
+        int rows = userMapper.updateUserInfoById(userId, req.getNickname(), req.getAvatarUrl(), req.getPhone());
         if (rows <= 0) {
             throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "更新失败，请稍后重试");
         }

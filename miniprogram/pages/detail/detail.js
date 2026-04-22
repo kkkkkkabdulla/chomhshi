@@ -3,6 +3,7 @@ const api = require('../../api/index');
 Page({
   data: {
     id: null,
+    isOwnerView: false,
     post: null,
     liked: false,
     likeAnimating: false,
@@ -13,7 +14,8 @@ Page({
 
   onLoad(options) {
     const id = Number(options.id);
-    this.setData({ id: Number.isNaN(id) ? null : id });
+    const isOwnerView = String(options.owner || '') === '1';
+    this.setData({ id: Number.isNaN(id) ? null : id, isOwnerView });
   },
 
   onShow() {
@@ -34,7 +36,9 @@ Page({
 
   async loadDetail() {
     try {
-      const res = await api.getPostDetail(this.data.id);
+      const res = this.data.isOwnerView
+        ? await api.getPostDetailForOwner(this.data.id)
+        : await api.getPostDetail(this.data.id);
       const post = res.data || null;
       const imageList = parseImages(post && post.images).slice(0, 6);
       this.setData({ post, imageList, imagePreviewList: imageList });

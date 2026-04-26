@@ -29,8 +29,13 @@
       <image class="heart-icon {{likeAnimating ? 'animate-liked' : ''}}" src="{{liked ? '/assets/icons/like-filled.svg' : '/assets/icons/like.svg'}}" mode="aspectFit" />
     </view>
 
+    <view class="heart-container" bindtap="onToggleCollect">
+      <image class="heart-icon {{collectAnimating ? 'animate-liked' : ''}}" src="{{collected ? '/assets/icons/collect-filled.svg' : '/assets/icons/collect.svg'}}" mode="aspectFit" />
+    </view>
+
     <view class="muted" style="flex:1;display:flex;align-items:center;gap:12rpx;">
       <text>{{liked ? '已点赞' : '点赞'}}（{{post.likeCount || 0}}）</text>
+      <text>{{collected ? '已收藏' : '收藏'}}（{{post.collectCount || 0}}）</text>
       <image class="heart-icon" src="/assets/icons/comment.svg" mode="aspectFit" />
       <text>评论 {{post.commentCount || 0}}</text>
     </view>

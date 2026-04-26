@@ -7,6 +7,8 @@ Page({
     post: null,
     liked: false,
     likeAnimating: false,
+    collected: false,
+    collectAnimating: false,
     commentContent: '',
     commentList: [],
     imageList: []
@@ -30,6 +32,7 @@ Page({
     await Promise.allSettled([
       this.loadDetail(),
       this.loadLiked(),
+      this.loadCollected(),
       this.loadComments()
     ]);
   },
@@ -49,6 +52,15 @@ Page({
     try {
       const res = await api.isLiked(this.data.id);
       this.setData({ liked: !!(res.data && res.data.liked) });
+    } catch (e) {
+      // 未登录会在 request.js 统一处理
+    }
+  },
+
+  async loadCollected() {
+    try {
+      const res = await api.isCollected(this.data.id);
+      this.setData({ collected: !!(res.data && res.data.collected) });
     } catch (e) {
       // 未登录会在 request.js 统一处理
     }
@@ -74,6 +86,23 @@ Page({
       });
       if (liked) {
         setTimeout(() => this.setData({ likeAnimating: false }), 450);
+      }
+    } catch (e) {}
+  },
+
+  async onToggleCollect() {
+    try {
+      const res = await api.toggleCollect(this.data.id);
+      const post = this.data.post || {};
+      post.collectCount = res.data.collectCount;
+      const collected = !!res.data.collected;
+      this.setData({
+        collected,
+        post,
+        collectAnimating: collected
+      });
+      if (collected) {
+        setTimeout(() => this.setData({ collectAnimating: false }), 450);
       }
     } catch (e) {}
   },

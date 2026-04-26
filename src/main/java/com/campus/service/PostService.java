@@ -3,6 +3,7 @@ package com.campus.service;
 import com.campus.common.PageResult;
 import com.campus.dto.request.PostPublishReq;
 import com.campus.dto.response.PostLikeResp;
+import com.campus.dto.response.PostCollectResp;
 import com.campus.dto.response.PostPublishResp;
 import com.campus.entity.Post;
 
@@ -25,4 +26,10 @@ public interface PostService {
     PostLikeResp toggleLike(Integer userId, Integer postId);
 
     boolean isLiked(Integer userId, Integer postId);
+
+    PostCollectResp toggleCollect(Integer userId, Integer postId);
+
+    boolean isCollected(Integer userId, Integer postId);
+
+    PageResult<Post> myCollects(Integer userId, Integer page, Integer pageSize);
 }

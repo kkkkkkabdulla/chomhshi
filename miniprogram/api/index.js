@@ -85,6 +85,17 @@ function isLiked(id) {
   return request({ url: `/api/post/isLiked/${id}` });
 }
 
+function toggleCollect(id) {
+  return request({
+    url: `/api/post/collect/${id}`,
+    method: 'POST'
+  });
+}
+
+function isCollected(id) {
+  return request({ url: `/api/post/isCollected/${id}` });
+}
+
 function addComment(data) {
   return request({
     url: '/api/comment/add',
@@ -129,6 +140,11 @@ function getAnnouncementList(params = {}) {
   return request({ url: `/api/announcement/list${query}`, needAuth: false });
 }
 
+function getMyCollects(params = {}) {
+  const query = toQuery(params);
+  return request({ url: `/api/post/myCollects${query}` });
+}
+
 function toQuery(obj = {}) {
   const arr = Object.keys(obj)
     .filter((k) => obj[k] !== undefined && obj[k] !== null && obj[k] !== '')
@@ -146,10 +162,13 @@ module.exports = {
   getPostDetail,
   getPostDetailForOwner,
   getMyPostList,
+  getMyCollects,
   updatePost,
   deletePost,
   toggleLike,
   isLiked,
+  toggleCollect,
+  isCollected,
   addComment,
   getCommentList,
   deleteComment,

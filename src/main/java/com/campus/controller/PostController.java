@@ -3,6 +3,7 @@ package com.campus.controller;
 import com.campus.common.PageResult;
 import com.campus.common.Result;
 import com.campus.dto.request.PostPublishReq;
+import com.campus.dto.response.PostCollectResp;
 import com.campus.dto.response.PostLikeResp;
 import com.campus.dto.response.PostPublishResp;
 import com.campus.entity.Post;
@@ -95,5 +96,26 @@ public class PostController {
         User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
         boolean liked = postService.isLiked(user.getId(), id);
         return Result.success(new PostLikeResp(liked, null));
+    }
+
+    @PostMapping("/collect/{id}")
+    public Result<PostCollectResp> collect(@PathVariable("id") Integer id, HttpServletRequest request) {
+        User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
+        return Result.success(postService.toggleCollect(user.getId(), id));
+    }
+
+    @GetMapping("/isCollected/{id}")
+    public Result<PostCollectResp> isCollected(@PathVariable("id") Integer id, HttpServletRequest request) {
+        User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
+        boolean collected = postService.isCollected(user.getId(), id);
+        return Result.success(new PostCollectResp(collected, null));
+    }
+
+    @GetMapping("/myCollects")
+    public Result<PageResult<Post>> myCollects(@RequestParam(defaultValue = "1") Integer page,
+                                             @RequestParam(defaultValue = "10") Integer pageSize,
+                                             HttpServletRequest request) {
+        User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
+        return Result.success(postService.myCollects(user.getId(), page, pageSize));
     }
 }

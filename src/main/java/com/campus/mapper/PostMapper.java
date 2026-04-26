@@ -43,6 +43,10 @@ public interface PostMapper {
 
     int increaseReportCount(@Param("id") Integer id);
 
+    int increaseCollectCount(@Param("id") Integer id);
+
+    int decreaseCollectCount(@Param("id") Integer id);
+
     int updateStatus(@Param("id") Integer id, @Param("status") Integer status);
 
     List<Post> findByStatus(@Param("status") Integer status,
@@ -50,4 +54,8 @@ public interface PostMapper {
                             @Param("pageSize") Integer pageSize);
 
     long countByStatus(@Param("status") Integer status);
+
+    List<Post> findPostsByIds(@Param("postIds") List<Integer> postIds,
+                              @Param("offset") Integer offset,
+                              @Param("pageSize") Integer pageSize);
 }

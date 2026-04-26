@@ -64,8 +64,8 @@
   </view>
 
   <view wx:for="{{list}}" wx:key="id" class="card" bindtap="goDetail" data-id="{{item.id}}" style="padding:18rpx;">
-    <view style="display:flex;gap:14rpx;">
-      <image src="{{item.imageList[0] || 'https://via.placeholder.com/220x220.png?text=Post'}}" mode="aspectFill" style="width:176rpx;height:176rpx;border-radius:14rpx;background:#f2f3f5;flex-shrink:0;" />
+    <view wx:if="{{item.imageList && item.imageList.length}}" style="display:flex;gap:14rpx;align-items:flex-start;">
+      <image src="{{item.imageList[0]}}" mode="aspectFill" style="width:176rpx;height:176rpx;border-radius:14rpx;background:#f2f3f5;flex-shrink:0;" />
 
       <view style="flex:1;min-width:0;">
         <view class="row-between" style="margin-bottom:8rpx;">
@@ -78,7 +78,17 @@
       </view>
     </view>
 
-    <view wx:if="{{item.imageList.length > 1}}" style="display:flex;gap:10rpx;margin-top:12rpx;">
+    <view wx:if="{{!item.imageList || !item.imageList.length}}" style="padding:8rpx 0;">
+      <view class="row-between" style="margin-bottom:8rpx;">
+        <view class="tag">{{item.type === 1 ? '失物招领' : '二手物品'}}</view>
+        <view wx:if="{{item.price !== null && item.price !== undefined}}" style="font-size:22rpx;background:#fff7e8;color:#ff7d00;border-radius:999rpx;padding:4rpx 10rpx;">￥{{item.price}}</view>
+      </view>
+      <view class="text-ellipsis" style="font-size:30rpx;font-weight:700;margin-bottom:8rpx;">{{item.title}}</view>
+      <view style="line-height:1.6;color:#4e5969;font-size:26rpx;margin-top:2rpx;">{{item.summary}}</view>
+      <view style="margin-top:10rpx;display:inline-flex;align-items:center;padding:6rpx 10rpx;border-radius:999rpx;background:#f5f7fa;color:#8b93a7;font-size:22rpx;">暂无图片</view>
+    </view>
+
+    <view wx:if="{{item.imageList && item.imageList.length > 1}}" style="display:flex;gap:10rpx;margin-top:12rpx;">
       <image wx:for="{{item.imageList}}" wx:key="index" wx:if="{{index > 0}}" src="{{item}}" mode="aspectFill" style="flex:1;height:132rpx;border-radius:10rpx;background:#f2f3f5;" />
     </view>
 
@@ -86,6 +96,10 @@
       <view class="icon-text" catchtap="onToggleLike" data-id="{{item.id}}" style="padding:6rpx 10rpx;border-radius:999rpx;background:{{item.liked ? '#fff1f0' : '#f5f7fa'}};opacity:{{item.liking ? 0.6 : 1}};">
         <image class="icon-lg" src="{{item.liked ? '/assets/icons/like-filled.svg' : '/assets/icons/like.svg'}}" mode="aspectFit" />
         <text style="color:{{item.liked ? '#ff4d4f' : '#667085'}};">{{item.likeCount}}</text>
+      </view>
+      <view class="icon-text" catchtap="onToggleCollect" data-id="{{item.id}}" style="padding:6rpx 10rpx;border-radius:999rpx;background:{{item.collected ? '#fff7e6' : '#f5f7fa'}};opacity:{{item.collecting ? 0.6 : 1}};">
+        <image class="icon-lg" src="{{item.collected ? '/assets/icons/collect-filled.svg' : '/assets/icons/collect.svg'}}" mode="aspectFit" />
+        <text style="color:{{item.collected ? '#faad14' : '#667085'}};">{{item.collectCount}}</text>
       </view>
       <view class="icon-text">
         <image class="icon-lg" src="/assets/icons/comment.svg" mode="aspectFit" />

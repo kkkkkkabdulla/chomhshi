@@ -22,6 +22,7 @@ public class Post {
     private Integer likeCount;
     private Integer commentCount;
     private Integer reportCount;
+    private Integer collectCount;
     private Date createTime;
     private Date updateTime;
 
@@ -159,6 +160,14 @@ public class Post {
 
     public void setReportCount(Integer reportCount) {
         this.reportCount = reportCount;
+    }
+
+    public Integer getCollectCount() {
+        return collectCount;
+    }
+
+    public void setCollectCount(Integer collectCount) {
+        this.collectCount = collectCount;
     }
 
     public Date getCreateTime() {

@@ -68,12 +68,14 @@ Page({
           imageList,
           summary: pickSummary(item.description),
           liked: false,
-          liking: false
+          liking: false,
+          collected: false,
+          collecting: false
         };
       });
 
       if (hasLoginToken() && list.length) {
-        list = await fillLikedState(list);
+        list = await fillLikedAndCollectedState(list);
       }
 
       this.setData({ list });
@@ -120,6 +122,49 @@ Page({
     } catch (e) {
       const rollbackList = (this.data.list || []).map((item) =>
         Number(item.id) === id ? { ...item, liking: false } : item
+      );
+      this.setData({ list: rollbackList });
+      // 401 等错误由 request.js 统一处理
+    }
+  },
+
+  async onToggleCollect(e) {
+    const id = Number(e.currentTarget.dataset.id);
+    if (!id) return;
+
+    const currentList = this.data.list || [];
+    const target = currentList.find((item) => Number(item.id) === id);
+    if (!target || target.collecting) return;
+
+    const markLoadingList = currentList.map((item) =>
+      Number(item.id) === id ? { ...item, collecting: true } : item
+    );
+    this.setData({ list: markLoadingList });
+
+    try {
+      const res = await api.toggleCollect(id);
+      const collected = !!(res.data && res.data.collected);
+      const collectCount = Number((res.data && res.data.collectCount) || 0);
+
+      const list = (this.data.list || []).map((item) => {
+        if (Number(item.id) !== id) return item;
+        return {
+          ...item,
+          collected,
+          collectCount,
+          collecting: false
+        };
+      });
+
+      this.setData({ list });
+      wx.showToast({
+        title: collected ? '已收藏' : '已取消收藏',
+        icon: 'none',
+        duration: 800
+      });
+    } catch (e) {
+      const rollbackList = (this.data.list || []).map((item) =>
+        Number(item.id) === id ? { ...item, collecting: false } : item
       );
       this.setData({ list: rollbackList });
       // 401 等错误由 request.js 统一处理
@@ -217,13 +262,17 @@ function hasLoginToken() {
   return !!wx.getStorageSync('token');
 }
 
-async function fillLikedState(list) {
+async function fillLikedAndCollectedState(list) {
   const jobs = list.map(async (item) => {
     try {
-      const res = await api.isLiked(item.id);
+      const [likeRes, collectRes] = await Promise.allSettled([
+        api.isLiked(item.id),
+        api.isCollected(item.id)
+      ]);
       return {
         ...item,
-        liked: !!(res.data && res.data.liked)
+        liked: !!(likeRes.status === 'fulfilled' && likeRes.value.data && likeRes.value.data.liked),
+        collected: !!(collectRes.status === 'fulfilled' && collectRes.value.data && collectRes.value.data.collected)
       };
     } catch (e) {
       return item;

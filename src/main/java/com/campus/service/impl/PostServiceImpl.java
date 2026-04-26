@@ -4,9 +4,11 @@ import com.campus.common.BusinessException;
 import com.campus.common.PageResult;
 import com.campus.common.ResultCode;
 import com.campus.dto.request.PostPublishReq;
+import com.campus.dto.response.PostCollectResp;
 import com.campus.dto.response.PostLikeResp;
 import com.campus.dto.response.PostPublishResp;
 import com.campus.entity.Post;
+import com.campus.mapper.PostCollectMapper;
 import com.campus.mapper.PostLikeMapper;
 import com.campus.mapper.PostMapper;
 import com.campus.service.PostService;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +38,9 @@ public class PostServiceImpl implements PostService {
 
     @Resource
     private PostLikeMapper postLikeMapper;
+
+    @Resource
+    private PostCollectMapper postCollectMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -181,6 +187,51 @@ public class PostServiceImpl implements PostService {
     public boolean isLiked(Integer userId, Integer postId) {
         Integer count = postLikeMapper.countByPostAndUser(postId, userId);
         return count != null && count > 0;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PostCollectResp toggleCollect(Integer userId, Integer postId) {
+        Post post = postMapper.findById(postId);
+        if (post == null || post.getStatus() == null || post.getStatus() != 1) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "帖子不存在或不可收藏");
+        }
+
+        Integer count = postCollectMapper.countByPostAndUser(postId, userId);
+        boolean currentlyCollected = count != null && count > 0;
+
+        if (currentlyCollected) {
+            postCollectMapper.delete(postId, userId);
+            postMapper.decreaseCollectCount(postId);
+        } else {
+            postCollectMapper.insert(postId, userId);
+            postMapper.increaseCollectCount(postId);
+        }
+
+        Post latest = postMapper.findById(postId);
+        return new PostCollectResp(!currentlyCollected, latest == null ? 0 : latest.getCollectCount());
+    }
+
+    @Override
+    public boolean isCollected(Integer userId, Integer postId) {
+        Integer count = postCollectMapper.countByPostAndUser(postId, userId);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public PageResult<Post> myCollects(Integer userId, Integer page, Integer pageSize) {
+        int safePage = page == null || page < 1 ? 1 : page;
+        int safePageSize = pageSize == null || pageSize < 1 ? 10 : Math.min(pageSize, 50);
+        int offset = (safePage - 1) * safePageSize;
+
+        List<Integer> collectPostIds = postCollectMapper.findUserCollects(userId);
+        if (collectPostIds == null || collectPostIds.isEmpty()) {
+            return new PageResult<>(Collections.emptyList(), 0, safePage, safePageSize);
+        }
+
+        List<Post> list = postMapper.findPostsByIds(collectPostIds, offset, safePageSize);
+        long total = collectPostIds.size();
+        return new PageResult<>(list, total, safePage, safePageSize);
     }
 
     private void validateTypeSpecificFields(PostPublishReq req) {

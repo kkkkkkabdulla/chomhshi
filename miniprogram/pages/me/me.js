@@ -4,6 +4,8 @@ Page({
   data: {
     user: {},
     myPosts: [],
+    myCollects: [],
+    activeSection: 'collects',
     editingProfile: false,
     profileForm: {
       avatarUrl: '',
@@ -15,6 +17,7 @@ Page({
   onShow() {
     this.loadUser();
     this.loadMyPosts();
+    this.loadMyCollects();
   },
 
   async loadUser() {
@@ -39,9 +42,44 @@ Page({
     } catch (e) {}
   },
 
+  async loadMyCollects() {
+    try {
+      const res = await api.getMyCollects({ page: 1, pageSize: 20 });
+      const list = ((res.data && res.data.list) || []).map((item) => ({
+        ...item,
+        imageList: parseImages(item.images).slice(0, 3),
+        summary: pickSummary(item.description)
+      }));
+      this.setData({ myCollects: list });
+    } catch (e) {}
+  },
+
   goDetail(e) {
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({ url: `/pages/detail/detail?id=${id}&owner=1` });
+  },
+
+  goCollectDetail(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.navigateTo({ url: `/pages/detail/detail?id=${id}` });
+  },
+
+  switchSection(e) {
+    const section = e.currentTarget.dataset.section || 'collects';
+    this.setData({ activeSection: section });
+  },
+
+  countCollects() {
+    return (this.data.myCollects || []).length;
+  },
+
+  countPosts() {
+    return (this.data.myPosts || []).length;
+  },
+
+  onSectionSwipe(e) {
+    const index = Number(e.detail.current || 0);
+    this.setData({ activeSection: index === 0 ? 'collects' : 'posts' });
   },
 
   startEditProfile() {
@@ -138,6 +176,25 @@ Page({
     wx.reLaunch({ url: '/pages/login/login' });
   }
 });
+
+function parseImages(images) {
+  if (!images) return [];
+  if (Array.isArray(images)) return images;
+  const text = String(images).trim();
+  if (!text) return [];
+  try {
+    const arr = JSON.parse(text);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return text.split(',').map((s) => s.trim()).filter(Boolean);
+  }
+}
+
+function pickSummary(text) {
+  if (!text) return '暂无描述';
+  const t = String(text).trim();
+  return t.length > 50 ? `${t.slice(0, 50)}...` : t;
+}
 
 function showModalAsync({ title, content }) {
   return new Promise((resolve, reject) => {

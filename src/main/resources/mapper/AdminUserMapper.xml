@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.mapper.AdminUserMapper">
+
+    <resultMap id="UserListMap" type="com.campus.dto.response.AdminUserListItemResp">
+        <id column="id" property="id"/>
+        <result column="nickname" property="nickname"/>
+        <result column="phone" property="phone"/>
+        <result column="avatar_url" property="avatarUrl"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="last_active_time" property="lastActiveTime"/>
+        <result column="post_count" property="postCount"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="collect_count" property="collectCount"/>
+        <result column="report_count7d" property="reportCount7d"/>
+        <result column="post_count1h" property="postCount1h"/>
+        <result column="comment_count10m" property="commentCount10m"/>
+        <result column="risk_level" property="riskLevel"/>
+    </resultMap>
+
+    <resultMap id="UserDetailMap" type="com.campus.dto.response.AdminUserDetailResp">
+        <id column="id" property="id"/>
+        <result column="nickname" property="nickname"/>
+        <result column="phone" property="phone"/>
+        <result column="avatar_url" property="avatarUrl"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="last_active_time" property="lastActiveTime"/>
+        <result column="post_count" property="postCount"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="collect_count" property="collectCount"/>
+        <result column="report_count7d" property="reportCount7d"/>
+        <result column="post_count1h" property="postCount1h"/>
+        <result column="comment_count10m" property="commentCount10m"/>
+        <result column="risk_level" property="riskLevel"/>
+    </resultMap>
+
+    <select id="findUsers" resultMap="UserListMap">
+        SELECT u.id,
+               u.nickname,
+               u.phone,
+               u.avatar_url,
+               u.create_time,
+               u.update_time,
+               u.update_time AS last_active_time,
+               IFNULL(p.post_count, 0) AS post_count,
+               IFNULL(c.comment_count, 0) AS comment_count,
+               IFNULL(co.collect_count, 0) AS collect_count,
+               IFNULL(r.report_count7d, 0) AS report_count7d,
+               IFNULL(p.post_count1h, 0) AS post_count1h,
+               IFNULL(c.comment_count10m, 0) AS comment_count10m,
+               CASE
+                   WHEN IFNULL(p.post_count1h, 0) >= 5 THEN '发帖过多'
+                   WHEN IFNULL(c.comment_count10m, 0) >= 6 THEN '评论过密'
+                   WHEN IFNULL(r.report_count7d, 0) >= 3 THEN '举报过多'
+                   ELSE '正常'
+               END AS risk_level
+        FROM user u
+        LEFT JOIN (
+            SELECT user_id,
+                   COUNT(1) AS post_count,
+                   SUM(CASE WHEN create_time >= DATE_SUB(NOW(), INTERVAL 1 HOUR) THEN 1 ELSE 0 END) AS post_count1h
+            FROM post
+            GROUP BY user_id
+        ) p ON p.user_id = u.id
+        LEFT JOIN (
+            SELECT user_id,
+                   COUNT(1) AS comment_count,
+                   SUM(CASE WHEN create_time >= DATE_SUB(NOW(), INTERVAL 10 MINUTE) THEN 1 ELSE 0 END) AS comment_count10m
+            FROM post_comment
+            GROUP BY user_id
+        ) c ON c.user_id = u.id
+        LEFT JOIN (
+            SELECT user_id,
+                   COUNT(1) AS collect_count
+            FROM post_collect
+            GROUP BY user_id
+        ) co ON co.user_id = u.id
+        LEFT JOIN (
+            SELECT p.user_id AS user_id,
+                   COUNT(1) AS report_count7d
+            FROM post_report r
+            INNER JOIN post p ON p.id = r.post_id
+            WHERE r.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+              AND r.status = 0
+            GROUP BY p.user_id
+        ) r ON r.user_id = u.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                 OR u.phone LIKE CONCAT('%', #{keyword}, '%')
+                 OR u.id = #{keyword})
+            </if>
+            <if test="riskType != null and riskType != ''">
+                <if test="keyword != null and keyword != ''">AND</if>
+                (
+                    #{riskType} = 'normal' AND IFNULL(p.post_count1h, 0) &lt; 5 AND IFNULL(c.comment_count10m, 0) &lt; 6 AND IFNULL(r.report_count7d, 0) &lt; 3
+                    OR #{riskType} = 'post' AND IFNULL(p.post_count1h, 0) &gt;= 5
+                    OR #{riskType} = 'comment' AND IFNULL(c.comment_count10m, 0) &gt;= 6
+                    OR #{riskType} = 'report' AND IFNULL(r.report_count7d, 0) &gt;= 3
+                )
+            </if>
+        </where>
+        ORDER BY u.id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countUsers" resultType="long">
+        SELECT COUNT(1)
+        FROM user u
+        LEFT JOIN (
+            SELECT user_id,
+                   COUNT(1) AS post_count,
+                   SUM(CASE WHEN create_time >= DATE_SUB(NOW(), INTERVAL 1 HOUR) THEN 1 ELSE 0 END) AS post_count1h
+            FROM post
+            GROUP BY user_id
+        ) p ON p.user_id = u.id
+        LEFT JOIN (
+            SELECT user_id,
+                   COUNT(1) AS comment_count,
+                   SUM(CASE WHEN create_time >= DATE_SUB(NOW(), INTERVAL 10 MINUTE) THEN 1 ELSE 0 END) AS comment_count10m
+            FROM post_comment
+            GROUP BY user_id
+        ) c ON c.user_id = u.id
+        LEFT JOIN (
+            SELECT p.user_id AS user_id,
+                   COUNT(1) AS report_count7d
+            FROM post_report r
+            INNER JOIN post p ON p.id = r.post_id
+            WHERE r.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+              AND r.status = 0
+            GROUP BY p.user_id
+        ) r ON r.user_id = u.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                 OR u.phone LIKE CONCAT('%', #{keyword}, '%')
+                 OR u.id = #{keyword})
+            </if>
+            <if test="riskType != null and riskType != ''">
+                <if test="keyword != null and keyword != ''">AND</if>
+                (
+                    #{riskType} = 'normal' AND IFNULL(p.post_count1h, 0) &lt; 5 AND IFNULL(c.comment_count10m, 0) &lt; 6 AND IFNULL(r.report_count7d, 0) &lt; 3
+                    OR #{riskType} = 'post' AND IFNULL(p.post_count1h, 0) &gt;= 5
+                    OR #{riskType} = 'comment' AND IFNULL(c.comment_count10m, 0) &gt;= 6
+                    OR #{riskType} = 'report' AND IFNULL(r.report_count7d, 0) &gt;= 3
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="findUserDetail" resultMap="UserDetailMap">
+        SELECT u.id,
+               u.nickname,
+               u.phone,
+               u.avatar_url,
+               u.create_time,
+               u.update_time,
+               u.update_time AS last_active_time,
+               IFNULL(p.post_count, 0) AS post_count,
+               IFNULL(c.comment_count, 0) AS comment_count,
+               IFNULL(co.collect_count, 0) AS collect_count,
+               IFNULL(r.report_count7d, 0) AS report_count7d,
+               IFNULL(p.post_count1h, 0) AS post_count1h,
+               IFNULL(c.comment_count10m, 0) AS comment_count10m,
+               CASE
+                   WHEN IFNULL(p.post_count1h, 0) >= 5 THEN '发帖过多'
+                   WHEN IFNULL(c.comment_count10m, 0) >= 6 THEN '评论过密'
+                   WHEN IFNULL(r.report_count7d, 0) >= 3 THEN '举报过多'
+                   ELSE '正常'
+               END AS risk_level
+        FROM user u
+        LEFT JOIN (
+            SELECT user_id,
+                   COUNT(1) AS post_count,
+                   SUM(CASE WHEN create_time >= DATE_SUB(NOW(), INTERVAL 1 HOUR) THEN 1 ELSE 0 END) AS post_count1h
+            FROM post
+            GROUP BY user_id
+        ) p ON p.user_id = u.id
+        LEFT JOIN (
+            SELECT user_id,
+                   COUNT(1) AS comment_count,
+                   SUM(CASE WHEN create_time >= DATE_SUB(NOW(), INTERVAL 10 MINUTE) THEN 1 ELSE 0 END) AS comment_count10m
+            FROM post_comment
+            GROUP BY user_id
+        ) c ON c.user_id = u.id
+        LEFT JOIN (
+            SELECT user_id,
+                   COUNT(1) AS collect_count
+            FROM post_collect
+            GROUP BY user_id
+        ) co ON co.user_id = u.id
+        LEFT JOIN (
+            SELECT p.user_id AS user_id,
+                   COUNT(1) AS report_count7d
+            FROM post_report r
+            INNER JOIN post p ON p.id = r.post_id
+            WHERE r.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+              AND r.status = 0
+            GROUP BY p.user_id
+        ) r ON r.user_id = u.id
+        WHERE u.id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="findUserPosts" resultType="com.campus.entity.Post">
+        SELECT id, user_id, type, title, description, category, price, location,
+               lost_found_time, lost_status, images, contact, status,
+               view_count, like_count, comment_count, report_count, collect_count,
+               create_time, update_time
+        FROM post
+        WHERE user_id = #{id}
+        ORDER BY id DESC
+        LIMIT 50
+    </select>
+
+    <select id="findUserComments" resultType="com.campus.entity.PostComment">
+        SELECT id, post_id, user_id, content, parent_id, create_time
+        FROM post_comment
+        WHERE user_id = #{id}
+        ORDER BY id DESC
+        LIMIT 50
+    </select>
+
+    <select id="findUserCollects" resultType="com.campus.entity.Post">
+        SELECT p.id, p.user_id, p.type, p.title, p.description, p.category, p.price, p.location,
+               p.lost_found_time, p.lost_status, p.images, p.contact, p.status,
+               p.view_count, p.like_count, p.comment_count, p.report_count, p.collect_count,
+               p.create_time, p.update_time
+        FROM post_collect pc
+        INNER JOIN post p ON p.id = pc.post_id
+        WHERE pc.user_id = #{id}
+        ORDER BY pc.id DESC
+        LIMIT 50
+    </select>
+
+</mapper>

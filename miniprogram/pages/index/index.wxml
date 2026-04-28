@@ -1,112 +1,128 @@
 <view class="container">
   <view wx:if="{{noticePopupVisible}}" class="notice-mask" bindtap="closeNoticePopup">
     <view class="notice-modal" catchtap="noop">
-      <view style="display:flex;align-items:center;justify-content:space-between;gap:16rpx;margin-bottom:18rpx;">
-        <view>
-          <view style="font-size:22rpx;color:#1677ff;font-weight:800;letter-spacing:2rpx;">系统通知</view>
-          <view style="font-size:36rpx;font-weight:900;color:#1f2d3d;line-height:1.2;margin-top:6rpx;">公告</view>
+      <view class="notice-modal-header">
+        <view class="notice-modal-title-group">
+          <view class="notice-modal-badge">系统通知</view>
+          <view class="notice-modal-heading">公告</view>
         </view>
         <view class="notice-close" bindtap="closeNoticePopup">×</view>
       </view>
-      <view class="notice-head">
-        <view style="display:flex;align-items:center;gap:12rpx;min-width:0;">
-          <view wx:if="{{noticePopup.isLatest}}" style="padding:4rpx 10rpx;border-radius:999rpx;background:#1677ff;color:#fff;font-size:22rpx;font-weight:700;flex-shrink:0;">最新</view>
-          <view style="font-size:32rpx;font-weight:800;color:#1f2d3d;line-height:1.4;" class="text-ellipsis">{{noticePopup.title}}</view>
+      <view class="notice-modal-body">
+        <view class="notice-modal-item-header">
+          <view wx:if="{{noticePopup.isLatest}}" class="notice-latest-tag">最新</view>
+          <view class="notice-modal-item-title text-ellipsis">{{noticePopup.title}}</view>
         </view>
+        <view class="notice-modal-time">{{noticePopup.createdAtText}}</view>
+        <view class="notice-modal-content">{{noticePopup.content}}</view>
       </view>
-      <view class="notice-time">{{noticePopup.createdAtText}}</view>
-      <view class="notice-content" style="max-height:520rpx;overflow:auto;">{{noticePopup.content}}</view>
-      <button class="btn-primary" style="margin-top:16rpx;" bindtap="closeNoticePopup">我知道了</button>
+      <button class="btn-primary notice-modal-btn" bindtap="closeNoticePopup">我知道了</button>
     </view>
   </view>
 
-  <view class="card" style="padding-bottom:16rpx;">
-    <view class="section-title">信息广场</view>
+  <view class="search-card">
+    <view class="search-title-row">
+      <view class="search-title">信息广场</view>
+      <view class="search-title-dot"></view>
+    </view>
 
-    <view style="display:flex;gap:14rpx;align-items:center;margin-bottom:12rpx;">
-      <view class="icon-text" style="flex:1;background:#f4f7ff;padding:12rpx 14rpx;border-radius:12rpx;">
-        <image class="icon-sm" src="/assets/icons/search.svg" mode="aspectFit" />
-        <input class="input" style="flex:1;margin-bottom:0;border:none;background:transparent;padding:0;" placeholder="搜索" value="{{keyword}}" bindinput="onKeywordInput" />
+    <view class="search-bar">
+      <view class="search-input-wrap">
+        <image class="search-icon" src="/assets/icons/search.svg" mode="aspectFit" />
+        <input class="search-input" placeholder="搜索你感兴趣的内容..." value="{{keyword}}" bindinput="onKeywordInput" />
       </view>
-      <button size="mini" class="btn-primary" bindtap="onSearch">搜索</button>
+      <button size="mini" class="btn-primary search-btn" bindtap="onSearch">搜索</button>
     </view>
 
-    <view class="row" style="font-size:30rpx;color:#344054;line-height:1.8;gap:22rpx;flex-wrap:wrap;margin-top:2rpx;">
-      <text data-tab="second" bindtap="onTabClick" style="{{activeTab==='second' ? 'color:#1677ff;font-weight:700;' : ''}}">二手</text>
-      <text>｜</text>
-      <text data-tab="lost" bindtap="onTabClick" style="{{activeTab==='lost' ? 'color:#1677ff;font-weight:700;' : ''}}">失物</text>
-      <text>｜</text>
-      <text data-tab="free" bindtap="onTabClick" style="{{activeTab==='free' ? 'color:#1677ff;font-weight:700;' : ''}}">随心贴</text>
-      <text>｜</text>
-      <text data-tab="help" bindtap="onTabClick" style="{{activeTab==='help' ? 'color:#1677ff;font-weight:700;' : ''}}">互助</text>
-      <text>｜</text>
-      <text data-tab="notice" bindtap="onTabClick" style="{{activeTab==='notice' ? 'color:#1677ff;font-weight:700;' : ''}}">公告</text>
+    <view class="tab-row">
+      <view class="tab-item {{activeTab==='second' ? 'tab-active' : ''}}" data-tab="second" bindtap="onTabClick">
+        <text>二手</text>
+      </view>
+      <view class="tab-divider"></view>
+      <view class="tab-item {{activeTab==='lost' ? 'tab-active' : ''}}" data-tab="lost" bindtap="onTabClick">
+        <text>失物</text>
+      </view>
+      <view class="tab-divider"></view>
+      <view class="tab-item {{activeTab==='free' ? 'tab-active' : ''}}" data-tab="free" bindtap="onTabClick">
+        <text>随心贴</text>
+      </view>
+      <view class="tab-divider"></view>
+      <view class="tab-item {{activeTab==='help' ? 'tab-active' : ''}}" data-tab="help" bindtap="onTabClick">
+        <text>互助</text>
+      </view>
+      <view class="tab-divider"></view>
+      <view class="tab-item {{activeTab==='notice' ? 'tab-active' : ''}}" data-tab="notice" bindtap="onTabClick">
+        <text>公告</text>
+      </view>
     </view>
-
-    <view style="height:1rpx;background:#eceef2;margin:14rpx 0 2rpx;"></view>
   </view>
 
-  <view wx:if="{{activeTab === 'notice' && noticeList.length}}" class="card" style="padding:18rpx;">
-    <view style="margin-bottom:18rpx;">
-      <view style="font-size:22rpx;color:#1677ff;font-weight:800;letter-spacing:2rpx;">系统通知</view>
-      <view style="font-size:34rpx;font-weight:900;color:#1f2d3d;line-height:1.2;margin-top:4rpx;">公告</view>
+  <view wx:if="{{activeTab === 'notice' && noticeList.length}}" class="card notice-card">
+    <view class="notice-section-header">
+      <view class="notice-section-badge">系统通知</view>
+      <view class="notice-section-heading">公告</view>
     </view>
-    <view wx:for="{{noticeList}}" wx:key="id" style="padding:14rpx 0;border-bottom:1rpx solid #f2f3f5;{{item.isLatest ? 'background:#f0f7ff;border-radius:12rpx;padding:16rpx;border:1rpx solid #cfe3ff;margin-bottom:12rpx;' : ''}}" bindtap="goNoticeDetail" data-id="{{item.id}}">
-      <view class="row-between" style="margin-bottom:8rpx;gap:10rpx;">
-        <view style="display:flex;align-items:center;gap:10rpx;min-width:0;">
-          <view wx:if="{{item.isLatest}}" style="padding:4rpx 10rpx;border-radius:999rpx;background:#1677ff;color:#fff;font-size:22rpx;font-weight:700;flex-shrink:0;">最新</view>
-          <view style="font-weight:700;font-size:28rpx;max-width:420rpx;" class="text-ellipsis">{{item.title}}</view>
+    <view wx:for="{{noticeList}}" wx:key="id" class="notice-item {{item.isLatest ? 'notice-item-latest' : ''}}" bindtap="goNoticeDetail" data-id="{{item.id}}">
+      <view class="notice-item-header">
+        <view class="notice-item-title-row">
+          <view wx:if="{{item.isLatest}}" class="notice-latest-tag">最新</view>
+          <view class="notice-item-title text-ellipsis">{{item.title}}</view>
         </view>
-        <view class="muted">{{item.createdAtText}} · {{item.createdByText}}</view>
+        <view class="notice-item-meta">{{item.createdAtText}} · {{item.createdByText}}</view>
       </view>
-      <view class="muted" style="line-height:1.6;{{item.isLatest ? 'font-weight:600;color:#1f2d3d;' : ''}}">{{item.content}}</view>
+      <view class="notice-item-content muted">{{item.content}}</view>
     </view>
   </view>
 
-  <view wx:for="{{list}}" wx:key="id" class="card" bindtap="goDetail" data-id="{{item.id}}" style="padding:18rpx;">
-    <view wx:if="{{item.imageList && item.imageList.length}}" style="display:flex;gap:14rpx;align-items:flex-start;">
-      <image src="{{item.imageList[0]}}" mode="aspectFill" style="width:176rpx;height:176rpx;border-radius:14rpx;background:#f2f3f5;flex-shrink:0;" />
+  <view wx:for="{{list}}" wx:key="id" class="card post-card" bindtap="goDetail" data-id="{{item.id}}">
+    <view wx:if="{{item.imageList && item.imageList.length}}" class="post-card-with-img">
+      <image src="{{item.imageList[0]}}" mode="aspectFill" class="post-cover" />
 
-      <view style="flex:1;min-width:0;">
-        <view class="row-between" style="margin-bottom:8rpx;">
+      <view class="post-body">
+        <view class="post-header">
           <view class="tag">{{item.type === 1 ? '失物招领' : '二手物品'}}</view>
-          <view wx:if="{{item.price !== null && item.price !== undefined}}" style="font-size:22rpx;background:#fff7e8;color:#ff7d00;border-radius:999rpx;padding:4rpx 10rpx;">￥{{item.price}}</view>
+          <view wx:if="{{item.price !== null && item.price !== undefined}}" class="price-tag">￥{{item.price}}</view>
         </view>
-
-        <view class="text-ellipsis" style="font-size:30rpx;font-weight:700;margin-bottom:8rpx;">{{item.title}}</view>
-        <view style="line-height:1.6;color:#4e5969;font-size:26rpx;margin-top:2rpx;">{{item.summary}}</view>
+        <view class="post-title text-ellipsis">{{item.title}}</view>
+        <view class="post-summary">{{item.summary}}</view>
       </view>
     </view>
 
-    <view wx:if="{{!item.imageList || !item.imageList.length}}" style="padding:8rpx 0;">
-      <view class="row-between" style="margin-bottom:8rpx;">
+    <view wx:if="{{!item.imageList || !item.imageList.length}}" class="post-card-no-img">
+      <view class="post-header">
         <view class="tag">{{item.type === 1 ? '失物招领' : '二手物品'}}</view>
-        <view wx:if="{{item.price !== null && item.price !== undefined}}" style="font-size:22rpx;background:#fff7e8;color:#ff7d00;border-radius:999rpx;padding:4rpx 10rpx;">￥{{item.price}}</view>
+        <view wx:if="{{item.price !== null && item.price !== undefined}}" class="price-tag">￥{{item.price}}</view>
       </view>
-      <view class="text-ellipsis" style="font-size:30rpx;font-weight:700;margin-bottom:8rpx;">{{item.title}}</view>
-      <view style="line-height:1.6;color:#4e5969;font-size:26rpx;margin-top:2rpx;">{{item.summary}}</view>
-      <view style="margin-top:10rpx;display:inline-flex;align-items:center;padding:6rpx 10rpx;border-radius:999rpx;background:#f5f7fa;color:#8b93a7;font-size:22rpx;">暂无图片</view>
+      <view class="post-title text-ellipsis">{{item.title}}</view>
+      <view class="post-summary">{{item.summary}}</view>
+      <view class="post-no-img-hint">
+        <text>暂无图片</text>
+      </view>
     </view>
 
-    <view wx:if="{{item.imageList && item.imageList.length > 1}}" style="display:flex;gap:10rpx;margin-top:12rpx;">
-      <image wx:for="{{item.imageList}}" wx:key="index" wx:if="{{index > 0}}" src="{{item}}" mode="aspectFill" style="flex:1;height:132rpx;border-radius:10rpx;background:#f2f3f5;" />
+    <view wx:if="{{item.imageList && item.imageList.length > 1}}" class="post-extra-images">
+      <image wx:for="{{item.imageList}}" wx:key="index" wx:if="{{index > 0}}" src="{{item}}" mode="aspectFill" class="post-extra-img" />
     </view>
 
-    <view style="display:flex;gap:18rpx;align-items:center;margin-top:12rpx;" class="muted">
-      <view class="icon-text" catchtap="onToggleLike" data-id="{{item.id}}" style="padding:6rpx 10rpx;border-radius:999rpx;background:{{item.liked ? '#fff1f0' : '#f5f7fa'}};opacity:{{item.liking ? 0.6 : 1}};">
+    <view class="post-actions">
+      <view class="post-action-btn {{item.liked ? 'post-action-liked' : ''}}" catchtap="onToggleLike" data-id="{{item.id}}" style="opacity:{{item.liking ? 0.6 : 1}};">
         <image class="icon-lg" src="{{item.liked ? '/assets/icons/like-filled.svg' : '/assets/icons/like.svg'}}" mode="aspectFit" />
-        <text style="color:{{item.liked ? '#ff4d4f' : '#667085'}};">{{item.likeCount}}</text>
+        <text>{{item.likeCount}}</text>
       </view>
-      <view class="icon-text" catchtap="onToggleCollect" data-id="{{item.id}}" style="padding:6rpx 10rpx;border-radius:999rpx;background:{{item.collected ? '#fff7e6' : '#f5f7fa'}};opacity:{{item.collecting ? 0.6 : 1}};">
+      <view class="post-action-btn {{item.collected ? 'post-action-collected' : ''}}" catchtap="onToggleCollect" data-id="{{item.id}}" style="opacity:{{item.collecting ? 0.6 : 1}};">
         <image class="icon-lg" src="{{item.collected ? '/assets/icons/collect-filled.svg' : '/assets/icons/collect.svg'}}" mode="aspectFit" />
-        <text style="color:{{item.collected ? '#faad14' : '#667085'}};">{{item.collectCount}}</text>
+        <text>{{item.collectCount}}</text>
       </view>
-      <view class="icon-text">
+      <view class="post-action-btn">
         <image class="icon-lg" src="/assets/icons/comment.svg" mode="aspectFit" />
         <text>{{item.commentCount}}</text>
       </view>
     </view>
   </view>
 
-  <view wx:if="{{!list.length}}" class="muted" style="text-align:center;padding:64rpx 0;">暂无数据，试试更换关键词</view>
+  <view wx:if="{{!list.length}}" class="empty-state">
+    <view class="empty-icon">📭</view>
+    <view class="empty-text">暂无数据</view>
+    <view class="empty-hint">试试更换关键词或切换分类</view>
+  </view>
 </view>

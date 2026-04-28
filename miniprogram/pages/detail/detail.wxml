@@ -1,66 +1,89 @@
 <view class="container" wx:if="{{post}}">
-  <view class="card">
-    <view style="font-weight:800; font-size:36rpx; margin-bottom:14rpx; color:#1f2d3d;">{{post.title}}</view>
-    <view wx:if="{{post.status === 0 || post.status === 3}}" style="margin-bottom:12rpx;padding:12rpx 16rpx;border-radius:12rpx;background:#fff7e6;border:1rpx solid #ffd591;color:#ad6800;font-weight:700;">该帖子因违规已下架，不可点赞评论</view>
-    <view wx:if="{{post.status === 3}}" style="margin-bottom:12rpx;padding:12rpx 16rpx;border-radius:12rpx;background:#fff5f5;border:1rpx solid #ffd6d6;color:#d4380d;font-weight:700;">已被下架</view>
-    <view wx:if="{{post.status === 0}}" style="margin-bottom:12rpx;padding:12rpx 16rpx;border-radius:12rpx;background:#fffbe6;border:1rpx solid #ffe58f;color:#ad8b00;font-weight:700;">待审核中，审核通过后可正常互动</view>
-    <view style="background:#f7fbff;border:1rpx solid #d9e8ff;border-radius:16rpx;padding:18rpx 16rpx;margin-bottom:14rpx;">
-      <view style="font-size:24rpx;color:#1677ff;font-weight:700;margin-bottom:8rpx;">描述</view>
-      <view style="font-size:28rpx;line-height:1.7;color:#2c3e50;white-space:pre-wrap;">{{post.description || '暂无描述'}}</view>
+  <view class="detail-header-card">
+    <view class="detail-title">{{post.title}}</view>
+
+    <view wx:if="{{post.status === 0 || post.status === 3}}" class="detail-warning detail-warning-orange">
+      该帖子因违规已下架，不可点赞评论
+    </view>
+    <view wx:if="{{post.status === 3}}" class="detail-warning detail-warning-red">
+      已被下架
+    </view>
+    <view wx:if="{{post.status === 0}}" class="detail-warning detail-warning-yellow">
+      待审核中，审核通过后可正常互动
     </view>
 
-    <view class="row" style="gap:12rpx;flex-wrap:wrap;margin-bottom:10rpx;">
+    <view class="detail-desc-box">
+      <view class="detail-desc-label">描述</view>
+      <view class="detail-desc-text">{{post.description || '暂无描述'}}</view>
+    </view>
+
+    <view class="detail-meta-row">
       <view class="tag">{{post.type === 1 ? '失物招领' : '二手物品'}}</view>
-      <view class="muted" wx:if="{{post.price !== null && post.price !== undefined}}">价格：￥{{post.price}}</view>
-      <view class="muted" wx:if="{{post.contact}}">联系方式：{{post.contact}}</view>
+      <view class="detail-meta-item muted" wx:if="{{post.price !== null && post.price !== undefined}}">
+        <image class="icon-xs" src="/assets/icons/time.svg" mode="aspectFit" />
+        <text>价格：￥{{post.price}}</text>
+      </view>
+      <view class="detail-meta-item muted" wx:if="{{post.contact}}">
+        <image class="icon-xs" src="/assets/icons/location.svg" mode="aspectFit" />
+        <text>联系方式：{{post.contact}}</text>
+      </view>
     </view>
-
   </view>
 
   <view class="card" wx:if="{{imageList.length}}">
     <view class="section-title">图片</view>
-    <view style="display:flex;flex-wrap:wrap;gap:12rpx;">
-      <image wx:for="{{imageList}}" wx:key="index" src="{{item}}" mode="aspectFill" style="width:30%;height:200rpx;border-radius:10rpx;background:#f2f3f5;" bindtap="previewImage" data-index="{{index}}" />
+    <view class="detail-images">
+      <image wx:for="{{imageList}}" wx:key="index" src="{{item}}" mode="aspectFill" class="detail-img" bindtap="previewImage" data-index="{{index}}" />
     </view>
   </view>
 
-  <view wx:if="{{post.status !== 0 && post.status !== 3}}" class="card" style="display:flex; gap: 12rpx; align-items:center;">
-    <view class="heart-container" bindtap="onToggleLike">
+  <view wx:if="{{post.status !== 0 && post.status !== 3}}" class="detail-action-bar">
+    <view class="detail-action-btn {{liked ? 'detail-action-liked' : ''}}" bindtap="onToggleLike">
       <image class="heart-icon {{likeAnimating ? 'animate-liked' : ''}}" src="{{liked ? '/assets/icons/like-filled.svg' : '/assets/icons/like.svg'}}" mode="aspectFit" />
-    </view>
-
-    <view class="heart-container" bindtap="onToggleCollect">
-      <image class="heart-icon {{collectAnimating ? 'animate-liked' : ''}}" src="{{collected ? '/assets/icons/collect-filled.svg' : '/assets/icons/collect.svg'}}" mode="aspectFit" />
-    </view>
-
-    <view class="muted" style="flex:1;display:flex;align-items:center;gap:12rpx;">
       <text>{{liked ? '已点赞' : '点赞'}}（{{post.likeCount || 0}}）</text>
+    </view>
+    <view class="detail-action-btn {{collected ? 'detail-action-collected' : ''}}" bindtap="onToggleCollect">
+      <image class="heart-icon {{collectAnimating ? 'animate-liked' : ''}}" src="{{collected ? '/assets/icons/collect-filled.svg' : '/assets/icons/collect.svg'}}" mode="aspectFit" />
       <text>{{collected ? '已收藏' : '收藏'}}（{{post.collectCount || 0}}）</text>
+    </view>
+    <view class="detail-action-btn">
       <image class="heart-icon" src="/assets/icons/comment.svg" mode="aspectFit" />
       <text>评论 {{post.commentCount || 0}}</text>
     </view>
-    <button size="mini" bindtap="onReport">举报</button>
+    <view class="detail-report-btn" bindtap="onReport">举报</view>
   </view>
 
-  <view wx:if="{{post.status !== 0 && post.status !== 3}}" class="card">
-    <input class="input" placeholder="输入评论后按发送" value="{{commentContent}}" bindinput="onCommentInput" confirm-type="send" bindconfirm="onAddComment" />
+  <view wx:if="{{post.status !== 0 && post.status !== 3}}" class="detail-comment-input">
+    <view class="comment-input-wrap">
+      <input class="comment-input" placeholder="输入评论后按发送" value="{{commentContent}}" bindinput="onCommentInput" confirm-type="send" bindconfirm="onAddComment" />
+    </view>
   </view>
 
   <view class="card" wx:if="{{commentList.length}}">
     <view class="section-title">评论列表</view>
-    <view wx:for="{{commentList}}" wx:key="id" style="padding: 14rpx 0; border-bottom: 1rpx solid #f2f3f5;">
-      <view class="row" style="gap:10rpx;align-items:center;margin-bottom:8rpx;">
-        <image src="{{item.avatarUrl || 'https://via.placeholder.com/88x88.png?text=U'}}" mode="aspectFill" style="width:44rpx;height:44rpx;border-radius:50%;background:#f2f3f5;" />
-        <view style="font-weight:600;">{{item.nickname || ('用户' + item.userId)}}</view>
+    <view wx:for="{{commentList}}" wx:key="id" class="comment-item">
+      <image src="{{item.avatarUrl || 'https://via.placeholder.com/88x88.png?text=U'}}" mode="aspectFill" class="comment-avatar" />
+      <view class="comment-body">
+        <view class="comment-header">
+          <view class="comment-nickname">{{item.nickname || ('用户' + item.userId)}}</view>
+          <view class="comment-id muted">#{{item.id}}</view>
+        </view>
+        <view class="comment-content">{{item.content}}</view>
+        <view class="comment-time muted">{{item.createTime}}</view>
       </view>
-      <view>{{item.content}}</view>
-      <view class="muted" style="margin-top:6rpx;">#{{item.id}} {{item.createTime}}</view>
     </view>
   </view>
 
-  <view wx:if="{{!commentList.length}}" class="muted" style="text-align:center;">暂无评论</view>
+  <view wx:if="{{!commentList.length}}" class="empty-state">
+    <view class="empty-icon">💬</view>
+    <view class="empty-text">暂无评论</view>
+    <view class="empty-hint">快来发表第一条评论吧</view>
+  </view>
 </view>
 
 <view wx:else class="container">
-  <view class="card muted" style="text-align:center;">加载中...</view>
+  <view class="loading-card">
+    <view class="loading-spinner"></view>
+    <view class="loading-text">加载中...</view>
+  </view>
 </view>

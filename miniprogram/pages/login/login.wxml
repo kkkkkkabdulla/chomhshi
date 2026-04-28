@@ -1,14 +1,38 @@
-<view class="container" style="padding-top: 80rpx;">
-  <view class="card" style="text-align:center;">
-    <view style="font-size: 42rpx; font-weight: 700; margin-bottom: 12rpx;">校园信息平台</view>
-    <view class="muted" style="margin-bottom: 24rpx;">二手交易与失物招领一体化服务</view>
+<view class="login-page">
+  <view class="login-header">
+    <view class="login-logo-wrap">
+      <view class="login-logo">
+        <text class="logo-text">校</text>
+      </view>
+    </view>
+    <view class="login-title">校园信息平台</view>
+    <view class="login-subtitle">二手交易 · 失物招领 · 随心发布</view>
+  </view>
 
-    <view class="icon-text" style="justify-content:center;margin-bottom:20rpx;">
-      <image class="icon-sm" src="/assets/icons/me.svg" mode="aspectFit" />
-      <text class="muted">当前为开发模式（mock 登录）</text>
+  <view class="login-card">
+    <view class="login-card-header">
+      <view class="login-card-dot" style="background:#4f6ef7;"></view>
+      <view class="login-card-dot" style="background:#7c5cfc;"></view>
+      <view class="login-card-dot" style="background:#a78bfa;"></view>
+      <text class="login-card-label">账号登录</text>
     </view>
 
-    <input class="input" placeholder="输入 mock code，例如 123456" value="{{code}}" bindinput="onCodeInput" />
-    <button class="btn-primary" bindtap="onLogin" loading="{{loading}}" disabled="{{loading}}" style="position: relative; left: -2rpx; top: -2rpx">登录并进入</button>
+    <view class="login-input-wrap">
+      <view class="login-input-icon">
+        <image class="icon-sm" src="/assets/icons/me.svg" mode="aspectFit" />
+      </view>
+      <input class="login-input" placeholder="输入 mock code，例如 123456" value="{{code}}" bindinput="onCodeInput" />
+    </view>
+
+    <button class="btn-primary login-btn" bindtap="onLogin" loading="{{loading}}" disabled="{{loading}}" style="position: relative; left: 2rpx; top: 2rpx">登录并进入</button>
+
+    <view class="login-dev-hint">
+      <image class="icon-xs" src="/assets/icons/me.svg" mode="aspectFit" />
+      <text>当前为开发模式（mock 登录）</text>
+    </view>
+  </view>
+
+  <view class="login-footer">
+    <text class="login-footer-text">安全登录 · 信息加密保护</text>
   </view>
 </view>

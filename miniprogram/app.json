@@ -8,13 +8,13 @@
   ],
   "window": {
     "navigationBarTitleText": "校园平台",
-    "navigationBarBackgroundColor": "#ffffff",
-    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "#4f6ef7",
+    "navigationBarTextStyle": "white",
     "backgroundTextStyle": "light"
   },
   "tabBar": {
-    "color": "#8a8f99",
-    "selectedColor": "#1677ff",
+    "color": "#8b93a7",
+    "selectedColor": "#4f6ef7",
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [

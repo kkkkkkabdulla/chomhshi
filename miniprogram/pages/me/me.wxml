@@ -1,94 +1,104 @@
 <view class="container">
-  <view class="card">
-    <view class="section-title">我的资料</view>
-
-    <view wx:if="{{!editingProfile}}" class="row" style="gap:16rpx;align-items:center;margin-bottom:16rpx;">
-      <image src="{{user.avatarUrl || '/assets/images/default-avatar.png'}}" mode="aspectFill" style="width:96rpx;height:96rpx;border-radius:50%;background:#f2f3f5;border:2rpx solid #e6eefc;" />
-      <view style="flex:1;">
-        <view style="font-size:30rpx;font-weight:700;">{{user.nickname || '未设置昵称'}}</view>
-        <view class="muted" style="margin-top:4rpx;">{{user.phone || '未绑定手机号'}}</view>
+  <view class="profile-card">
+    <view wx:if="{{!editingProfile}}" class="profile-info">
+      <image src="{{user.avatarUrl || '/assets/images/default-avatar.png'}}" mode="aspectFill" class="profile-avatar" />
+      <view class="profile-text">
+        <view class="profile-nickname">{{user.nickname || '未设置昵称'}}</view>
+        <view class="profile-phone muted">{{user.phone || '未绑定手机号'}}</view>
       </view>
-      <button size="mini" bindtap="startEditProfile">编辑</button>
+      <view class="profile-edit-btn" bindtap="startEditProfile">
+        <image class="icon-sm" src="/assets/icons/edit.svg" mode="aspectFit" />
+        <text>编辑</text>
+      </view>
     </view>
 
-    <view wx:if="{{editingProfile}}" style="display:flex;flex-direction:column;gap:14rpx;">
-      <view class="row" style="gap:16rpx;align-items:center;">
-        <image src="{{profileForm.avatarUrl || '/assets/images/default-avatar.png'}}" mode="aspectFill" style="width:96rpx;height:96rpx;border-radius:50%;background:#f2f3f5;border:2rpx solid #e6eefc;" />
-        <button size="mini" bindtap="chooseAvatar">更换头像</button>
+    <view wx:if="{{editingProfile}}" class="profile-edit-form">
+      <view class="profile-edit-avatar-row">
+        <image src="{{profileForm.avatarUrl || '/assets/images/default-avatar.png'}}" mode="aspectFill" class="profile-avatar" />
+        <view class="profile-change-avatar-btn" bindtap="chooseAvatar">更换头像</view>
       </view>
       <input class="input" placeholder="昵称" value="{{profileForm.nickname}}" data-key="nickname" bindinput="onProfileInput" />
       <input class="input" placeholder="手机号" value="{{profileForm.phone}}" data-key="phone" bindinput="onProfileInput" maxlength="11" type="number" />
-      <view class="row" style="gap:12rpx;">
-        <button class="btn-primary" bindtap="saveProfile">保存</button>
-        <button bindtap="cancelEditProfile">取消</button>
+      <view class="profile-edit-actions">
+        <button class="btn-primary profile-save-btn" bindtap="saveProfile">保存</button>
+        <button class="profile-cancel-btn" bindtap="cancelEditProfile">取消</button>
       </view>
     </view>
 
-    <view class="row-between" style="margin-top:14rpx;">
+    <view class="profile-id-row">
       <view class="muted">用户ID</view>
-      <view>{{user.id || '-'}}</view>
+      <view class="profile-id-value">{{user.id || '-'}}</view>
     </view>
   </view>
 
-  <view class="card">
-    <view class="row" style="gap:0;margin-bottom:16rpx;overflow:hidden;border-radius:14rpx;border:1rpx solid #e6e8ef;">
-      <view style="flex:1;text-align:center;padding:16rpx 0;font-weight:700;{{activeSection === 'collects' ? 'background:#1677ff;color:#fff;' : 'background:#f5f7fa;color:#667085;'}}" bindtap="switchSection" data-section="collects">我的收藏（{{myCollects.length}}）</view>
-      <view style="width:1rpx;background:#e6e8ef;"></view>
-      <view style="flex:1;text-align:center;padding:16rpx 0;font-weight:700;{{activeSection === 'posts' ? 'background:#1677ff;color:#fff;' : 'background:#f5f7fa;color:#667085;'}}" bindtap="switchSection" data-section="posts">我的发布（{{myPosts.length}}）</view>
+  <view class="tabs-card">
+    <view class="tabs-header">
+      <view class="tab-switch {{activeSection === 'collects' ? 'tab-switch-active' : ''}}" bindtap="switchSection" data-section="collects">
+        <text>我的收藏</text>
+        <view class="tab-count">{{myCollects.length}}</view>
+      </view>
+      <view class="tab-switch {{activeSection === 'posts' ? 'tab-switch-active' : ''}}" bindtap="switchSection" data-section="posts">
+        <text>我的发布</text>
+        <view class="tab-count">{{myPosts.length}}</view>
+      </view>
     </view>
 
     <swiper current="{{activeSection === 'collects' ? 0 : 1}}" bindchange="onSectionSwipe" style="height:900rpx;">
       <swiper-item>
         <scroll-view scroll-y="true" style="height:900rpx;">
-          <view wx:for="{{myCollects}}" wx:key="id" class="card" bindtap="goCollectDetail" data-id="{{item.id}}" style="padding:18rpx;margin-bottom:12rpx;box-shadow:none;border:1rpx solid #eef1f6;">
-            <view wx:if="{{item.imageList && item.imageList.length}}" style="display:flex;gap:14rpx;align-items:flex-start;">
-              <image src="{{item.imageList[0]}}" mode="aspectFill" style="width:176rpx;height:176rpx;border-radius:14rpx;background:#f2f3f5;flex-shrink:0;" />
-              <view style="flex:1;min-width:0;">
-                <view class="row-between" style="margin-bottom:8rpx;align-items:flex-start;">
-                  <view style="font-weight:700;font-size:30rpx;max-width:68%;" class="text-ellipsis">{{item.title}}</view>
-                  <view class="tag" style="background:#f0f7ff;color:#1677ff;border:1rpx solid #cfe3ff;">已收藏</view>
+          <view wx:for="{{myCollects}}" wx:key="id" class="collect-item" bindtap="goCollectDetail" data-id="{{item.id}}">
+            <view wx:if="{{item.imageList && item.imageList.length}}" class="collect-item-with-img">
+              <image src="{{item.imageList[0]}}" mode="aspectFill" class="collect-cover" />
+              <view class="collect-body">
+                <view class="collect-item-header">
+                  <view class="collect-item-title text-ellipsis">{{item.title}}</view>
+                  <view class="collect-tag">已收藏</view>
                 </view>
-                <view style="line-height:1.6;color:#4e5969;font-size:26rpx;margin-top:2rpx;">{{item.summary}}</view>
-                <view class="row" style="gap:12rpx;align-items:center;margin-top:10rpx;">
-                  <view class="muted">{{item.category || '未分类'}}</view>
-                </view>
+                <view class="collect-summary">{{item.summary}}</view>
+                <view class="collect-category muted">{{item.category || '未分类'}}</view>
               </view>
             </view>
-            <view wx:if="{{!item.imageList || !item.imageList.length}}" style="padding:8rpx 0;">
-              <view class="row-between" style="margin-bottom:8rpx;align-items:flex-start;">
-                <view style="font-weight:700;font-size:30rpx;max-width:68%;" class="text-ellipsis">{{item.title}}</view>
-                <view class="tag" style="background:#f0f7ff;color:#1677ff;border:1rpx solid #cfe3ff;">已收藏</view>
+            <view wx:if="{{!item.imageList || !item.imageList.length}}" class="collect-item-no-img">
+              <view class="collect-item-header">
+                <view class="collect-item-title text-ellipsis">{{item.title}}</view>
+                <view class="collect-tag">已收藏</view>
               </view>
-              <view style="line-height:1.6;color:#4e5969;font-size:26rpx;margin-top:2rpx;">{{item.summary}}</view>
-              <view style="margin-top:10rpx;display:inline-flex;align-items:center;padding:6rpx 10rpx;border-radius:999rpx;background:#f5f7fa;color:#8b93a7;font-size:22rpx;">暂无图片</view>
+              <view class="collect-summary">{{item.summary}}</view>
+              <view class="collect-no-img-hint">暂无图片</view>
             </view>
           </view>
-          <view wx:if="{{!myCollects.length}}" class="muted" style="text-align:center;padding:18rpx 0;">暂无收藏记录</view>
+          <view wx:if="{{!myCollects.length}}" class="empty-state">
+            <view class="empty-icon">⭐</view>
+            <view class="empty-text">暂无收藏记录</view>
+          </view>
         </scroll-view>
       </swiper-item>
 
       <swiper-item>
         <scroll-view scroll-y="true" style="height:900rpx;">
-          <view wx:for="{{myPosts}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}" style="padding: 16rpx 0; border-bottom: 1rpx solid #f2f3f5;">
-            <view class="row-between" style="margin-bottom:8rpx;">
-              <view style="font-weight:600;max-width:68%;" class="text-ellipsis">{{item.title}}</view>
-              <view
-                class="tag"
-                style="{{item.status === 3 ? 'background:#fff1f0;color:#cf1322;border:1rpx solid #ffccc7;' : item.status === 0 ? 'background:#fffbe6;color:#ad6800;border:1rpx solid #ffe58f;' : 'background:#f6ffed;color:#389e0d;border:1rpx solid #b7eb8f;'}}"
-              >
+          <view wx:for="{{myPosts}}" wx:key="id" class="post-item" bindtap="goDetail" data-id="{{item.id}}">
+            <view class="post-item-header">
+              <view class="post-item-title text-ellipsis">{{item.title}}</view>
+              <view class="status-badge {{item.status === 3 ? 'status-offline' : item.status === 0 ? 'status-pending' : 'status-online'}}">
                 {{item.status === 3 ? '已下架' : item.status === 1 ? '已发布' : item.status === 0 ? '待审核' : item.status}}
               </view>
             </view>
-            <view class="muted" style="margin-bottom:10rpx;">{{item.description || '暂无描述'}}</view>
-            <view class="row" style="gap:12rpx;">
-              <button size="mini" class="btn-danger" data-id="{{item.id}}" catchtap="onDeletePost">删除</button>
+            <view class="post-item-desc muted">{{item.description || '暂无描述'}}</view>
+            <view class="post-item-actions">
+              <view class="post-delete-btn" data-id="{{item.id}}" catchtap="onDeletePost">
+                <image class="icon-xs" src="/assets/icons/delete.svg" mode="aspectFit" />
+                <text>删除</text>
+              </view>
             </view>
           </view>
-          <view wx:if="{{!myPosts.length}}" class="muted" style="text-align:center;padding:18rpx 0;">暂无发布记录</view>
+          <view wx:if="{{!myPosts.length}}" class="empty-state">
+            <view class="empty-icon">📝</view>
+            <view class="empty-text">暂无发布记录</view>
+          </view>
         </scroll-view>
       </swiper-item>
     </swiper>
   </view>
 
-  <button bindtap="onLogout" class="btn-danger">退出登录</button>
+  <view class="logout-btn" bindtap="onLogout">退出登录</view>
 </view>

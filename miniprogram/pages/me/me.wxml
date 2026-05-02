@@ -31,6 +31,10 @@
     </view>
   </view>
 
+  <view wx:if="{{user.blocked}}" class="blocked-banner">
+    {{user.blockedMessage || '您已被封禁，需要解封请联系 QQ:123456789'}}
+  </view>
+
   <view class="tabs-card">
     <view class="tabs-header">
       <view class="tab-switch {{activeSection === 'collects' ? 'tab-switch-active' : ''}}" bindtap="switchSection" data-section="collects">
@@ -46,26 +50,22 @@
     <swiper current="{{activeSection === 'collects' ? 0 : 1}}" bindchange="onSectionSwipe" style="height:900rpx;">
       <swiper-item>
         <scroll-view scroll-y="true" style="height:900rpx;">
-          <view wx:for="{{myCollects}}" wx:key="id" class="collect-item" bindtap="goCollectDetail" data-id="{{item.id}}">
-            <view wx:if="{{item.imageList && item.imageList.length}}" class="collect-item-with-img">
-              <image src="{{item.imageList[0]}}" mode="aspectFill" class="collect-cover" />
-              <view class="collect-body">
-                <view class="collect-item-header">
-                  <view class="collect-item-title text-ellipsis">{{item.title}}</view>
-                  <view class="collect-tag">已收藏</view>
-                </view>
-                <view class="collect-summary">{{item.summary}}</view>
-                <view class="collect-category muted">{{item.category || '未分类'}}</view>
+          <view wx:for="{{myCollects}}" wx:key="id" class="collect-card" bindtap="goCollectDetail" data-id="{{item.id}}">
+            <view class="collect-main">
+              <view class="collect-head-line">
+                <view class="collect-cat-tag">{{item.categoryLabel}}</view>
+                <view class="collect-star-tag">已收藏</view>
+              </view>
+
+              <view class="collect-title text-ellipsis">{{item.title}}</view>
+              <view class="collect-desc">{{item.summary}}</view>
+
+              <view wx:if="{{item.tagList && item.tagList.length}}" class="collect-tags-row">
+                <view wx:for="{{item.tagList}}" wx:key="*this" wx:for-item="t" class="collect-tag-pill">{{t}}</view>
               </view>
             </view>
-            <view wx:if="{{!item.imageList || !item.imageList.length}}" class="collect-item-no-img">
-              <view class="collect-item-header">
-                <view class="collect-item-title text-ellipsis">{{item.title}}</view>
-                <view class="collect-tag">已收藏</view>
-              </view>
-              <view class="collect-summary">{{item.summary}}</view>
-              <view class="collect-no-img-hint">暂无图片</view>
-            </view>
+
+            <image wx:if="{{item.imageList && item.imageList.length}}" src="{{item.imageList[0]}}" mode="aspectFill" class="collect-thumb-img" />
           </view>
           <view wx:if="{{!myCollects.length}}" class="empty-state">
             <view class="empty-icon">⭐</view>
@@ -76,20 +76,31 @@
 
       <swiper-item>
         <scroll-view scroll-y="true" style="height:900rpx;">
-          <view wx:for="{{myPosts}}" wx:key="id" class="post-item" bindtap="goDetail" data-id="{{item.id}}">
-            <view class="post-item-header">
-              <view class="post-item-title text-ellipsis">{{item.title}}</view>
-              <view class="status-badge {{item.status === 3 ? 'status-offline' : item.status === 0 ? 'status-pending' : 'status-online'}}">
-                {{item.status === 3 ? '已下架' : item.status === 1 ? '已发布' : item.status === 0 ? '待审核' : item.status}}
+          <view wx:for="{{myPosts}}" wx:key="id" class="mypost-card" bindtap="goDetail" data-id="{{item.id}}">
+            <view class="mypost-main">
+              <view class="mypost-head-line">
+                <view class="mypost-cat-tag">{{item.categoryLabel}}</view>
+                <view class="status-badge {{item.status === 3 ? 'status-offline' : item.status === 0 ? 'status-pending' : item.status === 2 ? 'status-rejected' : 'status-online'}}">
+                  {{item.status === 3 ? '已下架' : item.status === 1 ? '已发布' : item.status === 0 ? '待审核' : item.status === 2 ? '已拒绝' : item.status}}
+                </view>
+              </view>
+
+              <view class="mypost-title text-ellipsis">{{item.title}}</view>
+              <view class="mypost-desc">{{item.description || '暂无描述'}}</view>
+
+              <view wx:if="{{item.tagList && item.tagList.length}}" class="mypost-tags-row">
+                <view wx:for="{{item.tagList}}" wx:key="*this" wx:for-item="t" class="mypost-tag-pill">{{t}}</view>
+              </view>
+
+              <view class="mypost-foot-line">
+                <view class="post-delete-btn" data-id="{{item.id}}" catchtap="onDeletePost">
+                  <image class="icon-xs" src="/assets/icons/delete.svg" mode="aspectFit" />
+                  <text>删除</text>
+                </view>
               </view>
             </view>
-            <view class="post-item-desc muted">{{item.description || '暂无描述'}}</view>
-            <view class="post-item-actions">
-              <view class="post-delete-btn" data-id="{{item.id}}" catchtap="onDeletePost">
-                <image class="icon-xs" src="/assets/icons/delete.svg" mode="aspectFit" />
-                <text>删除</text>
-              </view>
-            </view>
+
+            <image wx:if="{{item.imageList && item.imageList.length}}" src="{{item.imageList[0]}}" mode="aspectFill" class="mypost-thumb-img" />
           </view>
           <view wx:if="{{!myPosts.length}}" class="empty-state">
             <view class="empty-icon">📝</view>

@@ -15,4 +15,9 @@ public interface UserMapper {
                            @Param("nickname") String nickname,
                            @Param("avatarUrl") String avatarUrl,
                            @Param("phone") String phone);
+
+    int updateUserStatus(@Param("id") Integer id,
+                         @Param("status") Integer status,
+                         @Param("banReason") String banReason,
+                         @Param("banRemark") String banRemark);
 }

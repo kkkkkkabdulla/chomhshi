@@ -21,6 +21,7 @@ public class AdminUserDetailResp {
     private Integer reportCount7d;
     private Integer postCount1h;
     private Integer commentCount10m;
+    private Integer status;
     private String riskLevel;
     private List<String> riskTags;
     private List<Post> posts;
@@ -53,6 +54,8 @@ public class AdminUserDetailResp {
     public void setPostCount1h(Integer postCount1h) { this.postCount1h = postCount1h; }
     public Integer getCommentCount10m() { return commentCount10m; }
     public void setCommentCount10m(Integer commentCount10m) { this.commentCount10m = commentCount10m; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
     public String getRiskLevel() { return riskLevel; }
     public void setRiskLevel(String riskLevel) { this.riskLevel = riskLevel; }
     public List<String> getRiskTags() { return riskTags; }

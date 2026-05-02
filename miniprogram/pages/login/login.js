@@ -28,7 +28,11 @@ Page({
 
       wx.setStorageSync('token', res.data.token);
       wx.setStorageSync('userInfo', res.data.user);
-      wx.showToast({ title: '登录成功', icon: 'success' });
+      if (res.data.user && res.data.user.blocked) {
+        wx.showToast({ title: res.data.user.blockedMessage || '该账号已被封禁', icon: 'none', duration: 3000 });
+      } else {
+        wx.showToast({ title: '登录成功', icon: 'success' });
+      }
       setTimeout(() => {
         wx.switchTab({ url: '/pages/index/index' });
       }, 300);

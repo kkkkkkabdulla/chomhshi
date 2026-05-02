@@ -7,8 +7,10 @@ import com.campus.dto.request.CommentAddReq;
 import com.campus.dto.response.PostCommentResp;
 import com.campus.entity.Post;
 import com.campus.entity.PostComment;
+import com.campus.entity.User;
 import com.campus.mapper.PostCommentMapper;
 import com.campus.mapper.PostMapper;
+import com.campus.mapper.UserMapper;
 import com.campus.service.CommentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +25,15 @@ public class CommentServiceImpl implements CommentService {
     private PostMapper postMapper;
 
     @Resource
+    private UserMapper userMapper;
+
+    @Resource
     private PostCommentMapper postCommentMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Integer add(Integer userId, CommentAddReq req) {
+        ensureUserNotBlocked(userId);
         Post post = postMapper.findById(req.getPostId());
         if (post == null || post.getStatus() == null || post.getStatus() != 1) {
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "帖子不存在或不可评论");
@@ -80,5 +86,15 @@ public class CommentServiceImpl implements CommentService {
             throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "删除评论失败");
         }
         postMapper.decreaseCommentCount(comment.getPostId());
+    }
+
+    private void ensureUserNotBlocked(Integer userId) {
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
+        }
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "您已被封禁，无法评论");
+        }
     }
 }

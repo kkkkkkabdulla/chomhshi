@@ -60,6 +60,18 @@ public class UserController {
         resp.setPhone(user.getPhone());
         resp.setNickname(user.getNickname());
         resp.setAvatarUrl(user.getAvatarUrl());
+        resp.setStatus(user.getStatus());
+        resp.setBlocked(user.getStatus() != null && user.getStatus() == 0);
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            String msg = "您已被封禁";
+            if (user.getBanReason() != null && !user.getBanReason().trim().isEmpty()) {
+                msg += "，原因：" + user.getBanReason();
+            }
+            msg += "，需要解封请联系管理员";
+            resp.setBlockedMessage(msg);
+        } else {
+            resp.setBlockedMessage(null);
+        }
         return resp;
     }
 }

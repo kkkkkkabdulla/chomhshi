@@ -36,19 +36,19 @@
 
     <view class="tab-row">
       <view class="tab-item {{activeTab==='second' ? 'tab-active' : ''}}" data-tab="second" bindtap="onTabClick">
-        <text>二手</text>
+        <text>二手交易</text>
       </view>
       <view class="tab-divider"></view>
       <view class="tab-item {{activeTab==='lost' ? 'tab-active' : ''}}" data-tab="lost" bindtap="onTabClick">
-        <text>失物</text>
-      </view>
-      <view class="tab-divider"></view>
-      <view class="tab-item {{activeTab==='free' ? 'tab-active' : ''}}" data-tab="free" bindtap="onTabClick">
-        <text>随心贴</text>
+        <text>失物招领</text>
       </view>
       <view class="tab-divider"></view>
       <view class="tab-item {{activeTab==='help' ? 'tab-active' : ''}}" data-tab="help" bindtap="onTabClick">
-        <text>互助</text>
+        <text>求助</text>
+      </view>
+      <view class="tab-divider"></view>
+      <view class="tab-item {{activeTab==='free' ? 'tab-active' : ''}}" data-tab="free" bindtap="onTabClick">
+        <text>自由动态</text>
       </view>
       <view class="tab-divider"></view>
       <view class="tab-item {{activeTab==='notice' ? 'tab-active' : ''}}" data-tab="notice" bindtap="onTabClick">
@@ -74,53 +74,40 @@
     </view>
   </view>
 
-  <view wx:for="{{list}}" wx:key="id" class="card post-card" bindtap="goDetail" data-id="{{item.id}}">
-    <view wx:if="{{item.imageList && item.imageList.length}}" class="post-card-with-img">
-      <image src="{{item.imageList[0]}}" mode="aspectFill" class="post-cover" />
-
-      <view class="post-body">
-        <view class="post-header">
-          <view class="tag">{{item.type === 1 ? '失物招领' : '二手物品'}}</view>
-          <view wx:if="{{item.price !== null && item.price !== undefined}}" class="price-tag">￥{{item.price}}</view>
-        </view>
-        <view class="post-title text-ellipsis">{{item.title}}</view>
-        <view class="post-summary">{{item.summary}}</view>
+  <view wx:for="{{list}}" wx:key="id" class="post-card" bindtap="goDetail" data-id="{{item.id}}">
+    <view class="post-main">
+      <view class="post-head-line">
+        <view class="post-cat-tag">{{item.categoryLabel}}</view>
+        <view wx:if="{{item.price !== null && item.price !== undefined}}" class="post-price-tag">￥{{item.price}}</view>
       </view>
-    </view>
 
-    <view wx:if="{{!item.imageList || !item.imageList.length}}" class="post-card-no-img">
-      <view class="post-header">
-        <view class="tag">{{item.type === 1 ? '失物招领' : '二手物品'}}</view>
-        <view wx:if="{{item.price !== null && item.price !== undefined}}" class="price-tag">￥{{item.price}}</view>
-      </view>
       <view class="post-title text-ellipsis">{{item.title}}</view>
-      <view class="post-summary">{{item.summary}}</view>
-      <view class="post-no-img-hint">
-        <text>暂无图片</text>
+      <view class="post-desc">{{item.summary}}</view>
+
+      <view wx:if="{{item.tagList && item.tagList.length}}" class="post-tags">
+        <view wx:for="{{item.tagList}}" wx:key="*this" wx:for-item="t" class="post-tag-pill">{{t}}</view>
+      </view>
+
+      <view class="post-foot-line">
+        <view class="post-action {{item.liked ? 'action-like' : ''}}" catchtap="onToggleLike" data-id="{{item.id}}">
+          <image class="action-icon" src="{{item.liked ? '/assets/icons/like-filled.svg' : '/assets/icons/like.svg'}}" mode="aspectFit" />
+          <text>{{item.likeCount || 0}}</text>
+        </view>
+        <view class="post-action {{item.collected ? 'action-collect' : ''}}" catchtap="onToggleCollect" data-id="{{item.id}}">
+          <image class="action-icon" src="{{item.collected ? '/assets/icons/collect-filled.svg' : '/assets/icons/collect.svg'}}" mode="aspectFit" />
+          <text>{{item.collectCount || 0}}</text>
+        </view>
+        <view class="post-action">
+          <image class="action-icon" src="/assets/icons/comment.svg" mode="aspectFit" />
+          <text>{{item.commentCount || 0}}</text>
+        </view>
       </view>
     </view>
 
-    <view wx:if="{{item.imageList && item.imageList.length > 1}}" class="post-extra-images">
-      <image wx:for="{{item.imageList}}" wx:key="index" wx:if="{{index > 0}}" src="{{item}}" mode="aspectFill" class="post-extra-img" />
-    </view>
-
-    <view class="post-actions">
-      <view class="post-action-btn {{item.liked ? 'post-action-liked' : ''}}" catchtap="onToggleLike" data-id="{{item.id}}" style="opacity:{{item.liking ? 0.6 : 1}};">
-        <image class="icon-lg" src="{{item.liked ? '/assets/icons/like-filled.svg' : '/assets/icons/like.svg'}}" mode="aspectFit" />
-        <text>{{item.likeCount}}</text>
-      </view>
-      <view class="post-action-btn {{item.collected ? 'post-action-collected' : ''}}" catchtap="onToggleCollect" data-id="{{item.id}}" style="opacity:{{item.collecting ? 0.6 : 1}};">
-        <image class="icon-lg" src="{{item.collected ? '/assets/icons/collect-filled.svg' : '/assets/icons/collect.svg'}}" mode="aspectFit" />
-        <text>{{item.collectCount}}</text>
-      </view>
-      <view class="post-action-btn">
-        <image class="icon-lg" src="/assets/icons/comment.svg" mode="aspectFit" />
-        <text>{{item.commentCount}}</text>
-      </view>
-    </view>
+    <image wx:if="{{item.imageList && item.imageList.length}}" src="{{item.imageList[0]}}" mode="aspectFill" class="post-thumb-img" />
   </view>
 
-  <view wx:if="{{!list.length}}" class="empty-state">
+  <view wx:if="{{activeTab !== 'notice' && !list.length}}" class="empty-state">
     <view class="empty-icon">📭</view>
     <view class="empty-text">暂无数据</view>
     <view class="empty-hint">试试更换关键词或切换分类</view>

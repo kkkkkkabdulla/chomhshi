@@ -6,6 +6,9 @@ public class UserInfoResp {
     private String phone;
     private String nickname;
     private String avatarUrl;
+    private Integer status;
+    private Boolean blocked;
+    private String blockedMessage;
 
     public Integer getId() {
         return id;
@@ -37,5 +40,29 @@ public class UserInfoResp {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Boolean getBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(Boolean blocked) {
+        this.blocked = blocked;
+    }
+
+    public String getBlockedMessage() {
+        return blockedMessage;
+    }
+
+    public void setBlockedMessage(String blockedMessage) {
+        this.blockedMessage = blockedMessage;
     }
 }

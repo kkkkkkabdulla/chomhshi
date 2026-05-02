@@ -52,10 +52,6 @@ public class UserServiceImpl implements UserService {
             userMapper.insert(user);
         }
 
-        if (user.getStatus() != null && user.getStatus() == 0) {
-            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "账号已被封禁");
-        }
-
         String token = TokenUtil.generateToken();
         Date expireTime = buildExpireTime(7);
 
@@ -110,6 +106,9 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
         }
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "您已被封禁，无法修改资料");
+        }
         int rows = userMapper.updateUserInfoById(userId, req.getNickname(), req.getAvatarUrl(), req.getPhone());
         if (rows <= 0) {
             throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "更新失败，请稍后重试");
@@ -122,6 +121,18 @@ public class UserServiceImpl implements UserService {
         userInfoResp.setPhone(user.getPhone());
         userInfoResp.setNickname(user.getNickname());
         userInfoResp.setAvatarUrl(user.getAvatarUrl());
+        userInfoResp.setStatus(user.getStatus());
+        userInfoResp.setBlocked(user.getStatus() != null && user.getStatus() == 0);
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            String msg = "您已被封禁";
+            if (user.getBanReason() != null && !user.getBanReason().trim().isEmpty()) {
+                msg += "，原因：" + user.getBanReason();
+            }
+            msg += "，需要解封请联系管理员";
+            userInfoResp.setBlockedMessage(msg);
+        } else {
+            userInfoResp.setBlockedMessage(null);
+        }
         return userInfoResp;
     }
 

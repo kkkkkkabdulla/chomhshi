@@ -18,7 +18,7 @@
     </view>
 
     <view class="detail-meta-row">
-      <view class="tag">{{post.type === 1 ? '失物招领' : '二手物品'}}</view>
+      <view class="tag">{{categoryLabel}}</view>
       <view class="detail-meta-item muted" wx:if="{{post.price !== null && post.price !== undefined}}">
         <image class="icon-xs" src="/assets/icons/time.svg" mode="aspectFit" />
         <text>价格：￥{{post.price}}</text>
@@ -27,6 +27,10 @@
         <image class="icon-xs" src="/assets/icons/location.svg" mode="aspectFit" />
         <text>联系方式：{{post.contact}}</text>
       </view>
+    </view>
+
+    <view wx:if="{{tagList.length}}" class="detail-tags-row">
+      <view wx:for="{{tagList}}" wx:key="*this" class="detail-tag">{{item}}</view>
     </view>
   </view>
 

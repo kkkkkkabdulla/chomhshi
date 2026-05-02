@@ -6,7 +6,9 @@ import com.campus.dto.response.AdminUserListItemResp;
 
 public interface AdminUserService {
 
-    PageResult<AdminUserListItemResp> list(String keyword, String riskType, Integer page, Integer pageSize);
+    PageResult<AdminUserListItemResp> list(String keyword, Integer status, Integer page, Integer pageSize);
 
     AdminUserDetailResp detail(Integer id);
+
+    void updateStatus(Integer adminId, Integer id, Integer status, String reason, String remark);
 }

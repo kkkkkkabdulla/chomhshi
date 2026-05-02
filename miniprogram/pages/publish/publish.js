@@ -1,15 +1,24 @@
 const api = require('../../api/index');
 
+const CATEGORY_CONFIG = [
+  { label: '二手交易', value: '二手交易', type: 2 },
+  { label: '失物招领', value: '失物招领', type: 1 },
+  { label: '求助', value: '求助', type: 4 },
+  { label: '自由动态', value: '自由动态', type: 5 }
+];
+
+const PRESET_TAGS = [
+  '书籍', '电子产品', '生活用品', '代跑服务',
+  '学习资料', '校园活动', '寻物启事', '技能交换', '闲置物品'
+];
+
 Page({
   data: {
-    currentType: 2, // 2 二手物品，1 失物招领
-    categoryTabs: [
-      { label: '二手物品', value: '二手物品', type: 2 },
-      { label: '失物招领', value: '失物招领', type: 1 },
-      { label: '随心贴', value: '随心贴', type: 3 },
-      { label: '互助', value: '互助', type: 3 }
-    ],
-    activeCategory: '二手物品',
+    currentType: 2,
+    categoryTabs: CATEGORY_CONFIG,
+    activeCategory: '',
+    presetTags: PRESET_TAGS,
+    selectedTags: [],
     form: {
       title: '',
       description: '',
@@ -20,19 +29,6 @@ Page({
     loading: false
   },
 
-  switchType(e) {
-    const type = Number(e.currentTarget.dataset.type);
-    if (!type || type === this.data.currentType) return;
-    this.setData({
-      currentType: type,
-      form: {
-        ...this.data.form,
-        price: type === 2 ? this.data.form.price : '',
-        contact: type === 1 ? this.data.form.contact : ''
-      }
-    });
-  },
-
   onCategorySelect(e) {
     const value = e.currentTarget.dataset.value;
     const selected = this.data.categoryTabs.find((it) => it.value === value);
@@ -41,6 +37,22 @@ Page({
       activeCategory: selected.value,
       currentType: Number(selected.type || 3)
     });
+  },
+
+  onTagToggle(e) {
+    const tag = e.currentTarget.dataset.tag;
+    let selectedTags = this.data.selectedTags.slice();
+    const idx = selectedTags.indexOf(tag);
+    if (idx > -1) {
+      selectedTags.splice(idx, 1);
+    } else {
+      if (selectedTags.length >= 5) {
+        wx.showToast({ title: '最多选择5个标签', icon: 'none' });
+        return;
+      }
+      selectedTags.push(tag);
+    }
+    this.setData({ selectedTags });
   },
 
   onInput(e) {
@@ -92,11 +104,12 @@ Page({
   async submit() {
     if (this.data.loading) return;
 
-    const type = this.data.currentType;
-    if (!type || ![1, 2, 3].includes(type)) {
+    if (!this.data.activeCategory) {
       wx.showToast({ title: '请选择分类', icon: 'none' });
       return;
     }
+
+    const type = this.data.currentType;
     const f = this.data.form;
 
     if (!f.title.trim()) {
@@ -111,12 +124,7 @@ Page({
       wx.showToast({ title: '请填写价格', icon: 'none' });
       return;
     }
-
-    if (type === 1 && !f.contact.trim()) {
-      wx.showToast({ title: '请填写联系方式', icon: 'none' });
-      return;
-    }
-    if (type === 2 && !f.contact.trim()) {
+    if ((type === 1 || type === 2) && !f.contact.trim()) {
       wx.showToast({ title: '请填写联系方式', icon: 'none' });
       return;
     }
@@ -126,6 +134,7 @@ Page({
       title: f.title.trim(),
       description: f.description.trim(),
       category: this.data.activeCategory,
+      tags: JSON.stringify(this.data.selectedTags),
       price: type === 2 ? Number(f.price) : null,
       images: JSON.stringify(this.data.imageUrls),
       contact: f.contact.trim(),

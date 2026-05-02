@@ -11,6 +11,8 @@ public class User {
     private String avatarUrl;
     private Integer role;
     private Integer status;
+    private String banReason;
+    private String banRemark;
     private Date createTime;
     private Date updateTime;
 
@@ -68,6 +70,22 @@ public class User {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getBanReason() {
+        return banReason;
+    }
+
+    public void setBanReason(String banReason) {
+        this.banReason = banReason;
+    }
+
+    public String getBanRemark() {
+        return banRemark;
+    }
+
+    public void setBanRemark(String banRemark) {
+        this.banRemark = banRemark;
     }
 
     public Date getCreateTime() {

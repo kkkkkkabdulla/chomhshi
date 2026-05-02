@@ -12,19 +12,21 @@
         <result column="avatar_url" property="avatarUrl"/>
         <result column="role" property="role"/>
         <result column="status" property="status"/>
+        <result column="ban_reason" property="banReason"/>
+        <result column="ban_remark" property="banRemark"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <select id="findByPhone" resultMap="BaseResultMap">
-        SELECT id, openid, phone, nickname, avatar_url, role, status, create_time, update_time
+        SELECT id, openid, phone, nickname, avatar_url, role, status, ban_reason, ban_remark, create_time, update_time
         FROM user
         WHERE phone = #{phone}
         LIMIT 1
     </select>
 
     <select id="findById" resultMap="BaseResultMap">
-        SELECT id, openid, phone, nickname, avatar_url, role, status, create_time, update_time
+        SELECT id, openid, phone, nickname, avatar_url, role, status, ban_reason, ban_remark, create_time, update_time
         FROM user
         WHERE id = #{id}
         LIMIT 1
@@ -40,6 +42,15 @@
         SET nickname = #{nickname},
             avatar_url = #{avatarUrl},
             phone = #{phone}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateUserStatus">
+        UPDATE user
+        SET status = #{status},
+            ban_reason = #{banReason},
+            ban_remark = #{banRemark},
+            update_time = CURRENT_TIMESTAMP
         WHERE id = #{id}
     </update>
 

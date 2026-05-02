@@ -52,6 +52,11 @@ function request({ url, method = 'GET', data = {}, header = {}, needAuth = true 
           return reject(body);
         }
 
+        if (body.code === 403) {
+          wx.showToast({ title: body.msg || '您已被封禁', icon: 'none', duration: 3000 });
+          return reject(body);
+        }
+
         wx.showToast({ title: body.msg || '请求失败', icon: 'none' });
         return reject(body);
       },

@@ -7,7 +7,9 @@ import com.campus.dto.response.AdminUserDetailResp;
 import com.campus.dto.response.AdminUserListItemResp;
 import com.campus.entity.Post;
 import com.campus.entity.PostComment;
+import com.campus.entity.User;
 import com.campus.mapper.AdminUserMapper;
+import com.campus.mapper.UserMapper;
 import com.campus.service.AdminUserService;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +22,16 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Resource
     private AdminUserMapper adminUserMapper;
-
+    @Resource
+    private UserMapper userMapper;
 
     @Override
-    public PageResult<AdminUserListItemResp> list(String keyword, String riskType, Integer page, Integer pageSize) {
+    public PageResult<AdminUserListItemResp> list(String keyword, Integer status, Integer page, Integer pageSize) {
         int safePage = page == null || page < 1 ? 1 : page;
         int safePageSize = pageSize == null || pageSize < 1 ? 10 : Math.min(pageSize, 50);
         int offset = (safePage - 1) * safePageSize;
-        List<AdminUserListItemResp> list = adminUserMapper.findUsers(trimToNull(keyword), trimToNull(riskType), offset, safePageSize);
-        long total = adminUserMapper.countUsers(trimToNull(keyword), trimToNull(riskType));
+        List<AdminUserListItemResp> list = adminUserMapper.findUsers(trimToNull(keyword), status, offset, safePageSize);
+        long total = adminUserMapper.countUsers(trimToNull(keyword), status);
         return new PageResult<>(list, total, safePage, safePageSize);
     }
 
@@ -42,6 +45,17 @@ public class AdminUserServiceImpl implements AdminUserService {
         resp.setComments(castComments(adminUserMapper.findUserComments(id)));
         resp.setCollects(castPosts(adminUserMapper.findUserCollects(id)));
         return resp;
+    }
+
+    @Override
+    public void updateStatus(Integer adminId, Integer id, Integer status, String reason, String remark) {
+        User user = userMapper.findById(id);
+        if (user == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
+        }
+        String banReason = status == 0 ? reason : null;
+        String banRemark = status == 0 ? remark : null;
+        userMapper.updateUserStatus(id, status, banReason, banRemark);
     }
 
     private String trimToNull(String str) {

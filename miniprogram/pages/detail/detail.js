@@ -1,5 +1,27 @@
 const api = require('../../api/index');
 
+function getCategoryLabel(post) {
+  if (post.category) return post.category;
+  if (post.type === 1) return '失物招领';
+  if (post.type === 2) return '二手交易';
+  if (post.type === 4) return '求助';
+  if (post.type === 5) return '自由动态';
+  return '其他';
+}
+
+function parseTags(tags) {
+  if (!tags) return [];
+  if (Array.isArray(tags)) return tags;
+  const text = String(tags).trim();
+  if (!text) return [];
+  try {
+    const arr = JSON.parse(text);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return text.split(',').map((s) => s.trim()).filter(Boolean);
+  }
+}
+
 Page({
   data: {
     id: null,
@@ -11,7 +33,9 @@ Page({
     collectAnimating: false,
     commentContent: '',
     commentList: [],
-    imageList: []
+    imageList: [],
+    categoryLabel: '',
+    tagList: []
   },
 
   onLoad(options) {
@@ -44,7 +68,9 @@ Page({
         : await api.getPostDetail(this.data.id);
       const post = res.data || null;
       const imageList = parseImages(post && post.images).slice(0, 6);
-      this.setData({ post, imageList, imagePreviewList: imageList });
+      const categoryLabel = post ? getCategoryLabel(post) : '';
+      const tagList = post ? parseTags(post.tags) : [];
+      this.setData({ post, imageList, imagePreviewList: imageList, categoryLabel, tagList });
     } catch (e) {}
   },
 
@@ -52,18 +78,14 @@ Page({
     try {
       const res = await api.isLiked(this.data.id);
       this.setData({ liked: !!(res.data && res.data.liked) });
-    } catch (e) {
-      // 未登录会在 request.js 统一处理
-    }
+    } catch (e) {}
   },
 
   async loadCollected() {
     try {
       const res = await api.isCollected(this.data.id);
       this.setData({ collected: !!(res.data && res.data.collected) });
-    } catch (e) {
-      // 未登录会在 request.js 统一处理
-    }
+    } catch (e) {}
   },
 
   async loadComments() {

@@ -5,8 +5,10 @@ import com.campus.common.ResultCode;
 import com.campus.dto.request.ReportAddReq;
 import com.campus.entity.Post;
 import com.campus.entity.PostReport;
+import com.campus.entity.User;
 import com.campus.mapper.PostMapper;
 import com.campus.mapper.PostReportMapper;
+import com.campus.mapper.UserMapper;
 import com.campus.service.ReportService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,11 +24,15 @@ public class ReportServiceImpl implements ReportService {
     private PostMapper postMapper;
 
     @Resource
+    private UserMapper userMapper;
+
+    @Resource
     private PostReportMapper postReportMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean addReport(Integer userId, ReportAddReq req) {
+        ensureUserNotBlocked(userId);
         Post post = postMapper.findById(req.getPostId());
         if (post == null) {
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "帖子不存在");
@@ -52,5 +58,15 @@ public class ReportServiceImpl implements ReportService {
         postReportMapper.insert(report);
 
         return false;
+    }
+
+    private void ensureUserNotBlocked(Integer userId) {
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
+        }
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "您已被封禁，无法举报");
+        }
     }
 }

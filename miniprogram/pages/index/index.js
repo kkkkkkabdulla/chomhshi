@@ -1,5 +1,35 @@
 const api = require('../../api/index');
 
+const CATEGORY_MAP = {
+  second: '二手交易',
+  lost: '失物招领',
+  help: '求助',
+  free: '自由动态',
+  notice: '公告'
+};
+
+function getCategoryLabel(item) {
+  if (item.category) return item.category;
+  if (item.type === 1) return '失物招领';
+  if (item.type === 2) return '二手交易';
+  if (item.type === 4) return '求助';
+  if (item.type === 5) return '自由动态';
+  return '其他';
+}
+
+function parseTags(tags) {
+  if (!tags) return [];
+  if (Array.isArray(tags)) return tags;
+  const text = String(tags).trim();
+  if (!text) return [];
+  try {
+    const arr = JSON.parse(text);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return text.split(',').map((s) => s.trim()).filter(Boolean);
+  }
+}
+
 Page({
   data: {
     list: [],
@@ -7,7 +37,7 @@ Page({
     pageSize: 10,
     keyword: '',
     refreshing: false,
-    activeTab: '' ,// '' 表示不筛选，显示全部
+    activeTab: '',
     noticePopupVisible: false,
     noticePopupLoading: false,
     noticePopup: null,
@@ -39,17 +69,22 @@ Page({
 
   onTabClick(e) {
     const tab = e.currentTarget.dataset.tab || '';
-    const nextTab = this.data.activeTab === tab ? '' : tab; // 再点一次取消筛选
+    const nextTab = this.data.activeTab === tab ? '' : tab;
     this.setData({ activeTab: nextTab, page: 1 }, () => this.loadList());
   },
 
   async loadList() {
+    if (this.data.activeTab === 'notice') {
+      this.setData({ list: [] });
+      return;
+    }
+
     try {
       let type = null;
       if (this.data.activeTab === 'second') type = 2;
       if (this.data.activeTab === 'lost') type = 1;
-
-      const category = mapCategory(this.data.activeTab);
+      if (this.data.activeTab === 'help') type = 4;
+      if (this.data.activeTab === 'free') type = 5;
 
       const req = {
         page: this.data.page,
@@ -57,7 +92,6 @@ Page({
         keyword: this.data.keyword
       };
       if (type !== null) req.type = type;
-      if (category) req.category = category;
 
       const res = await api.getPostList(req);
 
@@ -67,6 +101,8 @@ Page({
           ...item,
           imageList,
           summary: pickSummary(item.description),
+          categoryLabel: getCategoryLabel(item),
+          tagList: parseTags(item.tags),
           liked: false,
           liking: false,
           collected: false,
@@ -124,7 +160,6 @@ Page({
         Number(item.id) === id ? { ...item, liking: false } : item
       );
       this.setData({ list: rollbackList });
-      // 401 等错误由 request.js 统一处理
     }
   },
 
@@ -167,7 +202,6 @@ Page({
         Number(item.id) === id ? { ...item, collecting: false } : item
       );
       this.setData({ list: rollbackList });
-      // 401 等错误由 request.js 统一处理
     }
   },
 
@@ -213,13 +247,6 @@ Page({
     wx.navigateTo({ url: `/pages/detail/detail?id=${id}` });
   }
 });
-
-function mapCategory(tab) {
-  if (tab === 'free') return '随心贴';
-  if (tab === 'help') return '互助';
-  if (tab === 'notice') return '公告';
-  return null;
-}
 
 function pickSummary(text) {
   if (!text) return '暂无描述';

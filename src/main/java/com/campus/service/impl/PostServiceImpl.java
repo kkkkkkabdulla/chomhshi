@@ -8,9 +8,11 @@ import com.campus.dto.response.PostCollectResp;
 import com.campus.dto.response.PostLikeResp;
 import com.campus.dto.response.PostPublishResp;
 import com.campus.entity.Post;
+import com.campus.entity.User;
 import com.campus.mapper.PostCollectMapper;
 import com.campus.mapper.PostLikeMapper;
 import com.campus.mapper.PostMapper;
+import com.campus.mapper.UserMapper;
 import com.campus.service.PostService;
 import com.campus.service.SensitiveWordService;
 import org.springframework.stereotype.Service;
@@ -28,10 +30,14 @@ public class PostServiceImpl implements PostService {
 
     private static final int POST_TYPE_LOST_FOUND = 1;
     private static final int POST_TYPE_SECOND_HAND = 2;
-    private static final int POST_TYPE_ANNOUNCEMENT = 3;
+    private static final int POST_TYPE_HELP = 4;
+    private static final int POST_TYPE_FREE = 5;
 
     @Resource
     private PostMapper postMapper;
+
+    @Resource
+    private UserMapper userMapper;
 
     @Resource
     private SensitiveWordService sensitiveWordService;
@@ -45,6 +51,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PostPublishResp publish(Integer userId, PostPublishReq req) {
+        ensureUserNotBlocked(userId, "发帖");
         validateTypeSpecificFields(req);
 
         String hitWord = detectSensitiveContent(req);
@@ -82,6 +89,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PageResult<Post> myList(Integer userId, Integer page, Integer pageSize) {
+        ensureUserNotBlocked(userId, "查看帖子列表");
         int safePage = page == null || page < 1 ? 1 : page;
         int safePageSize = pageSize == null || pageSize < 1 ? 10 : Math.min(pageSize, 50);
         int offset = (safePage - 1) * safePageSize;
@@ -163,6 +171,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PostLikeResp toggleLike(Integer userId, Integer postId) {
+        ensureUserNotBlocked(userId, "点赞");
         Post post = postMapper.findById(postId);
         if (post == null || post.getStatus() == null || post.getStatus() != 1) {
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "帖子不存在或不可点赞");
@@ -192,6 +201,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PostCollectResp toggleCollect(Integer userId, Integer postId) {
+        ensureUserNotBlocked(userId, "收藏");
         Post post = postMapper.findById(postId);
         if (post == null || post.getStatus() == null || post.getStatus() != 1) {
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "帖子不存在或不可收藏");
@@ -239,21 +249,33 @@ public class PostServiceImpl implements PostService {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "帖子类型不能为空");
         }
 
-        if (req.getType() == POST_TYPE_ANNOUNCEMENT) {
-            if (!"公告".equals(req.getCategory())) {
-                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "公告类型的分类必须为公告");
-            }
-            return;
-        }
+        switch (req.getType()) {
+            case POST_TYPE_LOST_FOUND:
+                if (isBlank(req.getContact())) {
+                    throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "联系方式不能为空");
+                }
+                return;
 
-        if (isBlank(req.getContact())) {
-            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "联系方式不能为空");
-        }
+            case POST_TYPE_SECOND_HAND:
+                if (isBlank(req.getContact())) {
+                    throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "联系方式不能为空");
+                }
+                if (req.getPrice() == null) {
+                    throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "二手物品价格不能为空");
+                }
+                return;
 
-        if (POST_TYPE_SECOND_HAND == req.getType() && "二手物品".equals(req.getCategory())) {
-            if (req.getPrice() == null) {
-                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "二手物品价格不能为空");
-            }
+            case POST_TYPE_HELP:
+                if (isBlank(req.getContact())) {
+                    throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "联系方式不能为空");
+                }
+                return;
+
+            case POST_TYPE_FREE:
+                return;
+
+            default:
+                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "帖子类型错误");
         }
     }
 
@@ -263,6 +285,16 @@ public class PostServiceImpl implements PostService {
             return hitInTitle;
         }
         return sensitiveWordService.detectFirstHit(req.getDescription());
+    }
+
+    private void ensureUserNotBlocked(Integer userId, String actionName) {
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
+        }
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "您已被封禁，无法" + actionName);
+        }
     }
 
     private void checkSensitiveContentForUpdate(PostPublishReq req) {

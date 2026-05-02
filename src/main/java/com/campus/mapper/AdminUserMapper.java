@@ -9,12 +9,12 @@ import java.util.List;
 public interface AdminUserMapper {
 
     List<AdminUserListItemResp> findUsers(@Param("keyword") String keyword,
-                                          @Param("riskType") String riskType,
+                                          @Param("status") Integer status,
                                           @Param("offset") Integer offset,
                                           @Param("pageSize") Integer pageSize);
 
     long countUsers(@Param("keyword") String keyword,
-                    @Param("riskType") String riskType);
+                    @Param("status") Integer status);
 
     AdminUserDetailResp findUserDetail(@Param("id") Integer id);
 

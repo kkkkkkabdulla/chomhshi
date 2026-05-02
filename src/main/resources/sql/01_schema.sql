@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   `wx_avatar` VARCHAR(255) COMMENT '微信头像',
   `role` TINYINT DEFAULT 1 COMMENT '1-普通用户 2-管理员',
   `status` TINYINT DEFAULT 1 COMMENT '1-正常 0-封禁',
+  `ban_reason` VARCHAR(200) DEFAULT NULL COMMENT '封禁原因',
+  `ban_remark` VARCHAR(500) DEFAULT NULL COMMENT '封禁备注',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
@@ -45,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `admin_token` (
 CREATE TABLE IF NOT EXISTS `post` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
   `user_id` INT NOT NULL COMMENT '发布者ID',
-  `type` TINYINT NOT NULL COMMENT '1-失物招领 2-二手物品',
+  `type` TINYINT NOT NULL COMMENT '1-失物招领 2-二手物品 4-求助 5-自由动态',
   `title` VARCHAR(200) NOT NULL,
   `description` TEXT,
   `category` VARCHAR(50),

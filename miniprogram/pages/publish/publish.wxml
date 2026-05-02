@@ -17,6 +17,24 @@
       </view>
     </view>
 
+    <view class="tag-section">
+      <view class="tag-section-header">
+        <view class="tag-section-label">内容标签</view>
+        <view class="tag-section-count muted">已选 {{selectedTags.length}} / 5</view>
+      </view>
+      <view class="tag-pills">
+        <view
+          wx:for="{{presetTags}}"
+          wx:key="*this"
+          data-tag="{{item}}"
+          bindtap="onTagToggle"
+          class="tag-pill {{selectedTags.indexOf(item) > -1 ? 'tag-pill-active' : ''}}"
+        >
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+
     <view class="divider"></view>
 
     <input class="input publish-input" placeholder="输入标题" value="{{form.title}}" data-key="title" bindinput="onInput" />
@@ -65,6 +83,6 @@
       </view>
     </view>
 
-    <button class="btn-primary publish-btn" bindtap="submit" loading="{{loading}}" disabled="{{loading}}">立即发布</button>
+    <button class="btn-primary publish-btn" bindtap="submit" loading="{{loading}}" disabled="{{loading}}" style="position: relative; left: 2rpx; top: 2rpx">立即发布</button>
   </view>
 </view>

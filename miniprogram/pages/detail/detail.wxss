@@ -75,6 +75,25 @@
   gap: 6rpx;
 }
 
+.detail-tags-row {
+  display: flex;
+  gap: 10rpx;
+  flex-wrap: wrap;
+  margin-top: 16rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid #f2f4f9;
+}
+
+.detail-tag {
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  background: #f0f2ff;
+  color: #7c5cfc;
+  font-weight: 500;
+  border: 1rpx solid #e0e4ff;
+}
+
 .detail-images {
   display: flex;
   flex-wrap: wrap;

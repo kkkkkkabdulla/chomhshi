@@ -9,6 +9,7 @@ import com.campus.entity.User;
 import com.campus.mapper.PostMapper;
 import com.campus.mapper.PostReportMapper;
 import com.campus.mapper.UserMapper;
+import com.campus.service.RateLimitService;
 import com.campus.service.ReportService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +30,14 @@ public class ReportServiceImpl implements ReportService {
     @Resource
     private PostReportMapper postReportMapper;
 
+    @Resource
+    private RateLimitService rateLimitService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean addReport(Integer userId, ReportAddReq req) {
         ensureUserNotBlocked(userId);
+        rateLimitService.checkReportLimit(userId);
         Post post = postMapper.findById(req.getPostId());
         if (post == null) {
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "帖子不存在");

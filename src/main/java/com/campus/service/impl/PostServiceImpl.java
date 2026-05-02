@@ -14,6 +14,7 @@ import com.campus.mapper.PostLikeMapper;
 import com.campus.mapper.PostMapper;
 import com.campus.mapper.UserMapper;
 import com.campus.service.PostService;
+import com.campus.service.RateLimitService;
 import com.campus.service.SensitiveWordService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,10 +49,14 @@ public class PostServiceImpl implements PostService {
     @Resource
     private PostCollectMapper postCollectMapper;
 
+    @Resource
+    private RateLimitService rateLimitService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PostPublishResp publish(Integer userId, PostPublishReq req) {
         ensureUserNotBlocked(userId, "发帖");
+        rateLimitService.checkPublishLimit(userId);
         validateTypeSpecificFields(req);
 
         String hitWord = detectSensitiveContent(req);

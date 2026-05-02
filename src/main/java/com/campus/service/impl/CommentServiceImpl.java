@@ -12,6 +12,7 @@ import com.campus.mapper.PostCommentMapper;
 import com.campus.mapper.PostMapper;
 import com.campus.mapper.UserMapper;
 import com.campus.service.CommentService;
+import com.campus.service.RateLimitService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +31,14 @@ public class CommentServiceImpl implements CommentService {
     @Resource
     private PostCommentMapper postCommentMapper;
 
+    @Resource
+    private RateLimitService rateLimitService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Integer add(Integer userId, CommentAddReq req) {
         ensureUserNotBlocked(userId);
+        rateLimitService.checkCommentLimit(userId);
         Post post = postMapper.findById(req.getPostId());
         if (post == null || post.getStatus() == null || post.getStatus() != 1) {
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "帖子不存在或不可评论");

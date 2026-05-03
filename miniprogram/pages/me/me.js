@@ -9,19 +9,6 @@ function getCategoryLabel(item) {
   return '其他';
 }
 
-function parseTags(tags) {
-  if (!tags) return [];
-  if (Array.isArray(tags)) return tags;
-  const text = String(tags).trim();
-  if (!text) return [];
-  try {
-    const arr = JSON.parse(text);
-    return Array.isArray(arr) ? arr : [];
-  } catch (e) {
-    return text.split(',').map((s) => s.trim()).filter(Boolean);
-  }
-}
-
 Page({
   data: {
     user: {},
@@ -53,8 +40,7 @@ Page({
         ...item,
         imageList: parseImages(item.images).slice(0, 3),
         summary: pickSummary(item.description),
-        categoryLabel: getCategoryLabel(item),
-        tagList: parseTags(item.tags)
+        categoryLabel: getCategoryLabel(item)
       }));
       this.setData({ myCollects: decorated });
     } catch (e) {}
@@ -67,8 +53,7 @@ Page({
       const decorated = list.map((item) => ({
         ...item,
         imageList: parseImages(item.images).slice(0, 3),
-        categoryLabel: getCategoryLabel(item),
-        tagList: parseTags(item.tags)
+        categoryLabel: getCategoryLabel(item)
       }));
       this.setData({ myPosts: decorated });
     } catch (e) {}
@@ -147,7 +132,7 @@ Page({
 
   onSectionSwipe(e) {
     const idx = e.detail.current;
-    this.setData({ activeSection: idx === 0 ? 'collects' : 'posts' });
+    this.setData({ activeSection: idx === 0 ? 'posts' : 'collects' });
   },
 
   goCollectDetail(e) {

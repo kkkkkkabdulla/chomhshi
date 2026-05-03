@@ -28,10 +28,6 @@
         <text>联系方式：{{post.contact}}</text>
       </view>
     </view>
-
-    <view wx:if="{{tagList.length}}" class="detail-tags-row">
-      <view wx:for="{{tagList}}" wx:key="*this" class="detail-tag">{{item}}</view>
-    </view>
   </view>
 
   <view class="card" wx:if="{{imageList.length}}">

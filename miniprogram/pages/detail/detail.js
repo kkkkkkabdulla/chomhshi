@@ -9,19 +9,6 @@ function getCategoryLabel(post) {
   return '其他';
 }
 
-function parseTags(tags) {
-  if (!tags) return [];
-  if (Array.isArray(tags)) return tags;
-  const text = String(tags).trim();
-  if (!text) return [];
-  try {
-    const arr = JSON.parse(text);
-    return Array.isArray(arr) ? arr : [];
-  } catch (e) {
-    return text.split(',').map((s) => s.trim()).filter(Boolean);
-  }
-}
-
 Page({
   data: {
     id: null,
@@ -35,7 +22,7 @@ Page({
     commentList: [],
     imageList: [],
     categoryLabel: '',
-    tagList: []
+    liked: false,
   },
 
   onLoad(options) {
@@ -69,8 +56,7 @@ Page({
       const post = res.data || null;
       const imageList = parseImages(post && post.images).slice(0, 6);
       const categoryLabel = post ? getCategoryLabel(post) : '';
-      const tagList = post ? parseTags(post.tags) : [];
-      this.setData({ post, imageList, imagePreviewList: imageList, categoryLabel, tagList });
+      this.setData({ post, imageList, imagePreviewList: imageList, categoryLabel });
     } catch (e) {}
   },
 

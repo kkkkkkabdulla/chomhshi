@@ -363,23 +363,6 @@
   overflow: hidden;
 }
 
-.post-tags {
-  display: flex;
-  gap: 8rpx;
-  flex-wrap: wrap;
-  margin-top: 8rpx;
-}
-
-.post-tag-pill {
-  font-size: 20rpx;
-  padding: 4rpx 14rpx;
-  border-radius: 999rpx;
-  background: #f0f2ff;
-  color: #7c5cfc;
-  font-weight: 500;
-  border: 1rpx solid #e0e4ff;
-}
-
 .post-foot-line {
   display: flex;
   align-items: center;
@@ -435,6 +418,13 @@
 }
 
 .empty-hint {
+  font-size: 24rpx;
+  color: #8b93a7;
+}
+
+.load-more-tip {
+  text-align: center;
+  padding: 24rpx 0 40rpx;
   font-size: 24rpx;
   color: #8b93a7;
 }

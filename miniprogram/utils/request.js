@@ -13,7 +13,7 @@ function clearLoginAndGoLogin(msg = '登录已过期，请重新登录') {
   }, 400);
 }
 
-function request({ url, method = 'GET', data = {}, header = {}, needAuth = true }) {
+function request({ url, method = 'GET', data = {}, header = {}, needAuth = true, silent401 = false }) {
   return new Promise((resolve, reject) => {
     const finalHeader = {
       'Content-Type': 'application/json',
@@ -48,7 +48,9 @@ function request({ url, method = 'GET', data = {}, header = {}, needAuth = true 
         }
 
         if (body.code === 401) {
-          clearLoginAndGoLogin();
+          if (!silent401) {
+            clearLoginAndGoLogin();
+          }
           return reject(body);
         }
 

@@ -17,19 +17,6 @@ function getCategoryLabel(item) {
   return '其他';
 }
 
-function parseTags(tags) {
-  if (!tags) return [];
-  if (Array.isArray(tags)) return tags;
-  const text = String(tags).trim();
-  if (!text) return [];
-  try {
-    const arr = JSON.parse(text);
-    return Array.isArray(arr) ? arr : [];
-  } catch (e) {
-    return text.split(',').map((s) => s.trim()).filter(Boolean);
-  }
-}
-
 Page({
   data: {
     list: [],
@@ -37,25 +24,35 @@ Page({
     pageSize: 10,
     keyword: '',
     refreshing: false,
+    loadingMore: false,
+    noMore: false,
     activeTab: '',
     noticePopupVisible: false,
     noticePopupLoading: false,
     noticePopup: null,
-    noticeList: []
+    noticeList: [],
+    _listReqId: 0
   },
 
   noop() {},
 
   onShow() {
-    this.loadList();
+    this.setData({ page: 1, noMore: false }, () => this.loadList());
     this.loadNoticeData();
   },
 
   onPullDownRefresh() {
-    this.setData({ refreshing: true, page: 1 }, async () => {
+    this.setData({ refreshing: true, page: 1, noMore: false }, async () => {
       await this.loadList();
       this.setData({ refreshing: false });
       wx.stopPullDownRefresh();
+    });
+  },
+
+  onReachBottom() {
+    if (this.data.loadingMore || this.data.noMore) return;
+    this.setData({ page: this.data.page + 1, loadingMore: true }, () => {
+      this.loadList(true);
     });
   },
 
@@ -64,20 +61,23 @@ Page({
   },
 
   onSearch() {
-    this.setData({ page: 1 }, () => this.loadList());
+    this.setData({ page: 1, noMore: false }, () => this.loadList());
   },
 
   onTabClick(e) {
     const tab = e.currentTarget.dataset.tab || '';
     const nextTab = this.data.activeTab === tab ? '' : tab;
-    this.setData({ activeTab: nextTab, page: 1 }, () => this.loadList());
+    this.setData({ activeTab: nextTab, page: 1, noMore: false }, () => this.loadList());
   },
 
-  async loadList() {
+  async loadList(append) {
     if (this.data.activeTab === 'notice') {
       this.setData({ list: [] });
       return;
     }
+
+    const currentReqId = this.data._listReqId + 1;
+    this.setData({ _listReqId: currentReqId });
 
     try {
       let type = null;
@@ -95,14 +95,15 @@ Page({
 
       const res = await api.getPostList(req);
 
-      let list = ((res.data && res.data.list) || []).map((item) => {
+      if (this.data._listReqId !== currentReqId) return;
+
+      let newList = ((res.data && res.data.list) || []).map((item) => {
         const imageList = parseImages(item.images).slice(0, 3);
         return {
           ...item,
           imageList,
           summary: pickSummary(item.description),
           categoryLabel: getCategoryLabel(item),
-          tagList: parseTags(item.tags),
           liked: false,
           liking: false,
           collected: false,
@@ -110,14 +111,23 @@ Page({
         };
       });
 
-      if (hasLoginToken() && list.length) {
-        list = await fillLikedAndCollectedState(list);
+      if (hasLoginToken() && newList.length) {
+        try {
+          newList = await fillLikedAndCollectedState(newList);
+        } catch (e) {
+          console.error('fillLikedAndCollectedState error:', e);
+        }
       }
 
-      this.setData({ list });
+      if (this.data._listReqId !== currentReqId) return;
+
+      const list = append ? this.data.list.concat(newList) : newList;
+      const noMore = newList.length < this.data.pageSize;
+      this.setData({ list, noMore, loadingMore: false });
     } catch (e) {
       console.error('loadList error:', e);
-      this.setData({ list: [] });
+      if (this.data._listReqId !== currentReqId) return;
+      this.setData({ list: append ? this.data.list : [], loadingMore: false });
     }
   },
 

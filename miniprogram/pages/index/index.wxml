@@ -84,10 +84,6 @@
       <view class="post-title text-ellipsis">{{item.title}}</view>
       <view class="post-desc">{{item.summary}}</view>
 
-      <view wx:if="{{item.tagList && item.tagList.length}}" class="post-tags">
-        <view wx:for="{{item.tagList}}" wx:key="*this" wx:for-item="t" class="post-tag-pill">{{t}}</view>
-      </view>
-
       <view class="post-foot-line">
         <view class="post-action {{item.liked ? 'action-like' : ''}}" catchtap="onToggleLike" data-id="{{item.id}}">
           <image class="action-icon" src="{{item.liked ? '/assets/icons/like-filled.svg' : '/assets/icons/like.svg'}}" mode="aspectFit" />
@@ -111,5 +107,10 @@
     <view class="empty-icon">📭</view>
     <view class="empty-text">暂无数据</view>
     <view class="empty-hint">试试更换关键词或切换分类</view>
+  </view>
+
+  <view wx:if="{{activeTab !== 'notice' && list.length}}" class="load-more-tip">
+    <text wx:if="{{loadingMore}}">加载中...</text>
+    <text wx:elif="{{noMore}}">— 已经到底了 —</text>
   </view>
 </view>

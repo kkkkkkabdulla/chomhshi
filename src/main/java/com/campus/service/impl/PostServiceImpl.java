@@ -94,7 +94,6 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PageResult<Post> myList(Integer userId, Integer page, Integer pageSize) {
-        ensureUserNotBlocked(userId, "查看帖子列表");
         int safePage = page == null || page < 1 ? 1 : page;
         int safePageSize = pageSize == null || pageSize < 1 ? 10 : Math.min(pageSize, 50);
         int offset = (safePage - 1) * safePageSize;

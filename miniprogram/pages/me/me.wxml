@@ -62,10 +62,6 @@
               <view class="mypost-title text-ellipsis">{{item.title}}</view>
               <view class="mypost-desc">{{item.description || '暂无描述'}}</view>
 
-              <view wx:if="{{item.tagList && item.tagList.length}}" class="mypost-tags-row">
-                <view wx:for="{{item.tagList}}" wx:key="*this" wx:for-item="t" class="mypost-tag-pill">{{t}}</view>
-              </view>
-
               <view class="mypost-foot-line">
                 <view class="post-delete-btn" data-id="{{item.id}}" catchtap="onDeletePost">
                   <image class="icon-xs" src="/assets/icons/delete.svg" mode="aspectFit" />
@@ -94,10 +90,6 @@
 
               <view class="collect-title text-ellipsis">{{item.title}}</view>
               <view class="collect-desc">{{item.summary}}</view>
-
-              <view wx:if="{{item.tagList && item.tagList.length}}" class="collect-tags-row">
-                <view wx:for="{{item.tagList}}" wx:key="*this" wx:for-item="t" class="collect-tag-pill">{{t}}</view>
-              </view>
             </view>
 
             <image wx:if="{{item.imageList && item.imageList.length}}" src="{{item.imageList[0]}}" mode="aspectFill" class="collect-thumb-img" />

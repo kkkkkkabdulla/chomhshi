@@ -7,18 +7,11 @@ const CATEGORY_CONFIG = [
   { label: '自由动态', value: '自由动态', type: 5 }
 ];
 
-const PRESET_TAGS = [
-  '书籍', '电子产品', '生活用品', '代跑服务',
-  '学习资料', '校园活动', '寻物启事', '闲置物品'
-];
-
 Page({
   data: {
     currentType: 2,
     categoryTabs: CATEGORY_CONFIG,
     activeCategory: '',
-    presetTags: PRESET_TAGS.map(t => ({ name: t, selected: false })),
-    selectedTags: [],
     form: {
       title: '',
       description: '',
@@ -38,30 +31,6 @@ Page({
       activeCategory: selected.value,
       currentType: Number(selected.type || 3)
     });
-  },
-
-  onTagToggle(e) {
-    const idx = e.currentTarget.dataset.idx;
-    let presetTags = this.data.presetTags.slice();
-    let tag = presetTags[idx];
-    if (!tag) return;
-
-    let selectedTags = this.data.selectedTags.slice();
-    if (tag.selected) {
-      tag = { ...tag, selected: false };
-      presetTags[idx] = tag;
-      const si = selectedTags.indexOf(tag.name);
-      if (si > -1) selectedTags.splice(si, 1);
-    } else {
-      if (selectedTags.length >= 5) {
-        wx.showToast({ title: '最多选择5个标签', icon: 'none' });
-        return;
-      }
-      tag = { ...tag, selected: true };
-      presetTags[idx] = tag;
-      selectedTags.push(tag.name);
-    }
-    this.setData({ presetTags, selectedTags });
   },
 
   onInput(e) {
@@ -143,7 +112,6 @@ Page({
       title: f.title.trim(),
       description: f.description.trim(),
       category: this.data.activeCategory,
-      tags: JSON.stringify(this.data.selectedTags),
       price: type === 2 ? Number(f.price) : null,
       images: JSON.stringify(this.data.imageUrls),
       contact: f.contact.trim(),

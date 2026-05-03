@@ -82,7 +82,7 @@ function toggleLike(id) {
 }
 
 function isLiked(id) {
-  return request({ url: `/api/post/isLiked/${id}` });
+  return request({ url: `/api/post/isLiked/${id}`, silent401: true });
 }
 
 function toggleCollect(id) {
@@ -93,7 +93,7 @@ function toggleCollect(id) {
 }
 
 function isCollected(id) {
-  return request({ url: `/api/post/isCollected/${id}` });
+  return request({ url: `/api/post/isCollected/${id}`, silent401: true });
 }
 
 function addComment(data) {

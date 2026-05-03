@@ -313,11 +313,15 @@ public class PostServiceImpl implements PostService {
         if (isBlank(time)) {
             return null;
         }
-        try {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(time.trim());
-        } catch (ParseException e) {
-            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "lostFoundTime 格式应为 yyyy-MM-dd HH:mm:ss");
+        String trimmed = time.trim();
+        String[] formats = { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd" };
+        for (String fmt : formats) {
+            try {
+                return new SimpleDateFormat(fmt).parse(trimmed);
+            } catch (ParseException ignored) {
+            }
         }
+        throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "lostFoundTime 格式应为 yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss");
     }
 
     private Post requireOwnedPost(Integer userId, Integer postId) {

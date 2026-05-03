@@ -3,7 +3,7 @@
     <view class="publish-title">发布动态</view>
 
     <view class="category-section">
-      <view class="category-label">选择分类（必选）</view>
+      <view class="category-label"><text class="required-star">*</text>选择分类</view>
       <view class="category-pills">
         <view
           wx:for="{{categoryTabs}}"
@@ -25,43 +25,46 @@
       <view class="tag-pills">
         <view
           wx:for="{{presetTags}}"
-          wx:key="*this"
-          data-tag="{{item}}"
+          wx:key="name"
+          data-idx="{{index}}"
           bindtap="onTagToggle"
-          class="tag-pill {{selectedTags.indexOf(item) > -1 ? 'tag-pill-active' : ''}}"
+          class="tag-pill {{item.selected ? 'tag-pill-active' : ''}}"
         >
-          <text>{{item}}</text>
+          <text>{{item.name}}</text>
         </view>
       </view>
     </view>
 
     <view class="divider"></view>
 
-    <input class="input publish-input" placeholder="输入标题" value="{{form.title}}" data-key="title" bindinput="onInput" />
+    <input class="input publish-input" placeholder="输入标题（必填）" maxlength="200" value="{{form.title}}" data-key="title" bindinput="onInput" />
 
     <view class="desc-section">
       <view class="desc-header">
-        <view class="desc-label">描述内容</view>
-        <view class="desc-count muted">{{form.description.length || 0}} / 500</view>
+        <view class="desc-label"><text class="required-star">*</text>描述内容</view>
+        <view class="desc-count muted">{{form.description.length || 0}} / 2000</view>
       </view>
       <textarea
         class="input publish-textarea"
-        maxlength="500"
-        placeholder="请详细描述你的帖子内容，越清楚越容易被看到"
+        maxlength="2000"
+        placeholder="{{currentType === 1 ? '请描述物品特征、丢失/拾到经过等' : currentType === 2 ? '请描述物品成色、购买时间、转让原因等' : currentType === 4 ? '请描述你遇到的困难或需要的帮助' : '分享你的校园生活动态...'}}"
         value="{{form.description}}"
         data-key="description"
         bindinput="onInput"
       />
     </view>
 
-    <view wx:if="{{currentType === 2}}">
-      <input class="input publish-input" placeholder="价格（元）" value="{{form.price}}" data-key="price" bindinput="onInput" type="digit" />
-    </view>
-    <view wx:if="{{currentType !== 2}}" class="price-hint muted">
-      当前类型不需要填写价格
+    <view wx:if="{{currentType === 1}}">
+      <input class="input publish-input" placeholder="丢失/拾到地点（选填）" maxlength="100" value="{{form.location}}" data-key="location" bindinput="onInput" />
     </view>
 
-    <input class="input publish-input" placeholder="联系方式（微信/手机号）" value="{{form.contact}}" data-key="contact" bindinput="onInput" />
+    <view wx:if="{{currentType === 2}}">
+      <input class="input publish-input" placeholder="价格（元，必填）" value="{{form.price}}" data-key="price" bindinput="onInput" type="digit" />
+    </view>
+
+    <view wx:if="{{currentType === 1 || currentType === 2 || currentType === 4}}">
+      <input class="input publish-input" placeholder="联系方式（微信/手机号，必填）" value="{{form.contact}}" data-key="contact" bindinput="onInput" />
+    </view>
 
     <view class="divider"></view>
 

@@ -37,43 +37,17 @@
 
   <view class="tabs-card">
     <view class="tabs-header">
-      <view class="tab-switch {{activeSection === 'collects' ? 'tab-switch-active' : ''}}" bindtap="switchSection" data-section="collects">
-        <text>我的收藏</text>
-        <view class="tab-count">{{myCollects.length}}</view>
-      </view>
       <view class="tab-switch {{activeSection === 'posts' ? 'tab-switch-active' : ''}}" bindtap="switchSection" data-section="posts">
         <text>我的发布</text>
         <view class="tab-count">{{myPosts.length}}</view>
       </view>
+      <view class="tab-switch {{activeSection === 'collects' ? 'tab-switch-active' : ''}}" bindtap="switchSection" data-section="collects">
+        <text>我的收藏</text>
+        <view class="tab-count">{{myCollects.length}}</view>
+      </view>
     </view>
 
-    <swiper current="{{activeSection === 'collects' ? 0 : 1}}" bindchange="onSectionSwipe" style="height:900rpx;">
-      <swiper-item>
-        <scroll-view scroll-y="true" style="height:900rpx;">
-          <view wx:for="{{myCollects}}" wx:key="id" class="collect-card" bindtap="goCollectDetail" data-id="{{item.id}}">
-            <view class="collect-main">
-              <view class="collect-head-line">
-                <view class="collect-cat-tag">{{item.categoryLabel}}</view>
-                <view class="collect-star-tag">已收藏</view>
-              </view>
-
-              <view class="collect-title text-ellipsis">{{item.title}}</view>
-              <view class="collect-desc">{{item.summary}}</view>
-
-              <view wx:if="{{item.tagList && item.tagList.length}}" class="collect-tags-row">
-                <view wx:for="{{item.tagList}}" wx:key="*this" wx:for-item="t" class="collect-tag-pill">{{t}}</view>
-              </view>
-            </view>
-
-            <image wx:if="{{item.imageList && item.imageList.length}}" src="{{item.imageList[0]}}" mode="aspectFill" class="collect-thumb-img" />
-          </view>
-          <view wx:if="{{!myCollects.length}}" class="empty-state">
-            <view class="empty-icon">⭐</view>
-            <view class="empty-text">暂无收藏记录</view>
-          </view>
-        </scroll-view>
-      </swiper-item>
-
+    <swiper current="{{activeSection === 'posts' ? 0 : 1}}" bindchange="onSectionSwipe" style="height:900rpx;">
       <swiper-item>
         <scroll-view scroll-y="true" style="height:900rpx;">
           <view wx:for="{{myPosts}}" wx:key="id" class="mypost-card" bindtap="goDetail" data-id="{{item.id}}">
@@ -105,6 +79,32 @@
           <view wx:if="{{!myPosts.length}}" class="empty-state">
             <view class="empty-icon">📝</view>
             <view class="empty-text">暂无发布记录</view>
+          </view>
+        </scroll-view>
+      </swiper-item>
+
+      <swiper-item>
+        <scroll-view scroll-y="true" style="height:900rpx;">
+          <view wx:for="{{myCollects}}" wx:key="id" class="collect-card" bindtap="goCollectDetail" data-id="{{item.id}}">
+            <view class="collect-main">
+              <view class="collect-head-line">
+                <view class="collect-cat-tag">{{item.categoryLabel}}</view>
+                <view class="collect-star-tag">已收藏</view>
+              </view>
+
+              <view class="collect-title text-ellipsis">{{item.title}}</view>
+              <view class="collect-desc">{{item.summary}}</view>
+
+              <view wx:if="{{item.tagList && item.tagList.length}}" class="collect-tags-row">
+                <view wx:for="{{item.tagList}}" wx:key="*this" wx:for-item="t" class="collect-tag-pill">{{t}}</view>
+              </view>
+            </view>
+
+            <image wx:if="{{item.imageList && item.imageList.length}}" src="{{item.imageList[0]}}" mode="aspectFill" class="collect-thumb-img" />
+          </view>
+          <view wx:if="{{!myCollects.length}}" class="empty-state">
+            <view class="empty-icon">⭐</view>
+            <view class="empty-text">暂无收藏记录</view>
           </view>
         </scroll-view>
       </swiper-item>

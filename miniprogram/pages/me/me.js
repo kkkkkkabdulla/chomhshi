@@ -27,7 +27,7 @@ Page({
     user: {},
     editingProfile: false,
     profileForm: { nickname: '', phone: '', avatarUrl: '' },
-    activeSection: 'collects',
+    activeSection: 'posts',
     myCollects: [],
     myPosts: []
   },

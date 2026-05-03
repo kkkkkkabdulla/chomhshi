@@ -9,7 +9,7 @@ const CATEGORY_CONFIG = [
 
 const PRESET_TAGS = [
   '书籍', '电子产品', '生活用品', '代跑服务',
-  '学习资料', '校园活动', '寻物启事', '技能交换', '闲置物品'
+  '学习资料', '校园活动', '寻物启事', '闲置物品'
 ];
 
 Page({
@@ -17,13 +17,14 @@ Page({
     currentType: 2,
     categoryTabs: CATEGORY_CONFIG,
     activeCategory: '',
-    presetTags: PRESET_TAGS,
+    presetTags: PRESET_TAGS.map(t => ({ name: t, selected: false })),
     selectedTags: [],
     form: {
       title: '',
       description: '',
       price: '',
-      contact: ''
+      contact: '',
+      location: ''
     },
     imageUrls: [],
     loading: false
@@ -40,19 +41,27 @@ Page({
   },
 
   onTagToggle(e) {
-    const tag = e.currentTarget.dataset.tag;
+    const idx = e.currentTarget.dataset.idx;
+    let presetTags = this.data.presetTags.slice();
+    let tag = presetTags[idx];
+    if (!tag) return;
+
     let selectedTags = this.data.selectedTags.slice();
-    const idx = selectedTags.indexOf(tag);
-    if (idx > -1) {
-      selectedTags.splice(idx, 1);
+    if (tag.selected) {
+      tag = { ...tag, selected: false };
+      presetTags[idx] = tag;
+      const si = selectedTags.indexOf(tag.name);
+      if (si > -1) selectedTags.splice(si, 1);
     } else {
       if (selectedTags.length >= 5) {
         wx.showToast({ title: '最多选择5个标签', icon: 'none' });
         return;
       }
-      selectedTags.push(tag);
+      tag = { ...tag, selected: true };
+      presetTags[idx] = tag;
+      selectedTags.push(tag.name);
     }
-    this.setData({ selectedTags });
+    this.setData({ presetTags, selectedTags });
   },
 
   onInput(e) {
@@ -124,7 +133,7 @@ Page({
       wx.showToast({ title: '请填写价格', icon: 'none' });
       return;
     }
-    if ((type === 1 || type === 2) && !f.contact.trim()) {
+    if ((type === 1 || type === 2 || type === 4) && !f.contact.trim()) {
       wx.showToast({ title: '请填写联系方式', icon: 'none' });
       return;
     }
@@ -138,8 +147,7 @@ Page({
       price: type === 2 ? Number(f.price) : null,
       images: JSON.stringify(this.data.imageUrls),
       contact: f.contact.trim(),
-      location: null,
-      lostFoundTime: type === 1 ? null : null,
+      location: type === 1 && f.location ? f.location.trim() : null,
       lostStatus: type === 1 ? 1 : null
     };
 

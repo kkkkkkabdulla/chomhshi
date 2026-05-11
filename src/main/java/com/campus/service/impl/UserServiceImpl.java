@@ -47,7 +47,6 @@ public class UserServiceImpl implements UserService {
             user.setPhone(mockPhone);
             user.setNickname("用户" + mockPhone.substring(7));
             user.setAvatarUrl("https://example.com/default-avatar.png");
-            user.setRole(1);
             user.setStatus(1);
             userMapper.insert(user);
         }

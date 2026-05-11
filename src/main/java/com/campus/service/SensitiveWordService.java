@@ -1,9 +1,16 @@
 package com.campus.service;
 
+import com.campus.entity.SensitiveWord;
+
+import java.util.List;
+
 public interface SensitiveWordService {
 
-    /**
-     * 检测文本中是否包含敏感词，命中返回敏感词，否则返回 null
-     */
     String detectFirstHit(String text);
+
+    List<SensitiveWord> listAll();
+
+    void addWord(String word, Integer level);
+
+    void deleteById(Integer id);
 }

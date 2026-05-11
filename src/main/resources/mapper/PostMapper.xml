@@ -13,15 +13,11 @@
         <result column="category" property="category"/>
         <result column="price" property="price"/>
         <result column="location" property="location"/>
-        <result column="lost_found_time" property="lostFoundTime"/>
-        <result column="lost_status" property="lostStatus"/>
         <result column="images" property="images"/>
         <result column="contact" property="contact"/>
         <result column="status" property="status"/>
-        <result column="view_count" property="viewCount"/>
         <result column="like_count" property="likeCount"/>
         <result column="comment_count" property="commentCount"/>
-        <result column="report_count" property="reportCount"/>
         <result column="collect_count" property="collectCount"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
@@ -29,17 +25,17 @@
 
     <insert id="insert" parameterType="com.campus.entity.Post" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO post(user_id, type, title, description, category, price, location,
-                         lost_found_time, lost_status, images, contact, status,
-                         view_count, like_count, comment_count, report_count, collect_count)
+                         images, contact, status,
+                         like_count, comment_count, collect_count)
         VALUES (#{userId}, #{type}, #{title}, #{description}, #{category}, #{price}, #{location},
-                #{lostFoundTime}, #{lostStatus}, #{images}, #{contact}, #{status},
-                #{viewCount}, #{likeCount}, #{commentCount}, #{reportCount}, 0)
+                #{images}, #{contact}, #{status},
+                #{likeCount}, #{commentCount}, 0)
     </insert>
 
     <select id="findMyPosts" resultMap="BaseResultMap">
         SELECT id, user_id, type, title, description, category, price, location,
-               lost_found_time, lost_status, images, contact, status,
-               view_count, like_count, comment_count, report_count, collect_count,
+               images, contact, status,
+               like_count, comment_count, collect_count,
                create_time, update_time
         FROM post
         WHERE user_id = #{userId}
@@ -55,8 +51,8 @@
 
     <select id="findApprovedPosts" resultMap="BaseResultMap">
         SELECT id, user_id, type, title, description, category, price, location,
-               lost_found_time, lost_status, images, contact, status,
-               view_count, like_count, comment_count, report_count, collect_count,
+               images, contact, status,
+               like_count, comment_count, collect_count,
                create_time, update_time
         FROM post
         WHERE status = 1
@@ -92,8 +88,8 @@
 
     <select id="findApprovedDetailById" resultMap="BaseResultMap">
         SELECT id, user_id, type, title, description, category, price, location,
-               lost_found_time, lost_status, images, contact, status,
-               view_count, like_count, comment_count, report_count, collect_count,
+               images, contact, status,
+               like_count, comment_count, collect_count,
                create_time, update_time
         FROM post
         WHERE id = #{id}
@@ -103,8 +99,8 @@
 
     <select id="findById" resultMap="BaseResultMap">
         SELECT id, user_id, type, title, description, category, price, location,
-               lost_found_time, lost_status, images, contact, status,
-               view_count, like_count, comment_count, report_count, collect_count,
+               images, contact, status,
+               like_count, comment_count, collect_count,
                create_time, update_time
         FROM post
         WHERE id = #{id}
@@ -118,8 +114,6 @@
             category = #{category},
             price = #{price},
             location = #{location},
-            lost_found_time = #{lostFoundTime},
-            lost_status = #{lostStatus},
             images = #{images},
             contact = #{contact},
             update_time = NOW()
@@ -159,13 +153,6 @@
         WHERE id = #{id}
     </update>
 
-    <update id="increaseReportCount">
-        UPDATE post
-        SET report_count = report_count + 1,
-            update_time = NOW()
-        WHERE id = #{id}
-    </update>
-
     <update id="increaseCollectCount">
         UPDATE post
         SET collect_count = collect_count + 1,
@@ -189,8 +176,8 @@
 
     <select id="findByStatus" resultMap="BaseResultMap">
         SELECT id, user_id, type, title, description, category, price, location,
-               lost_found_time, lost_status, images, contact, status,
-               view_count, like_count, comment_count, report_count, collect_count,
+               images, contact, status,
+               like_count, comment_count, collect_count,
                create_time, update_time
         FROM post
         <where>
@@ -214,8 +201,8 @@
 
     <select id="findPostsByIds" resultMap="BaseResultMap">
         SELECT id, user_id, type, title, description, category, price, location,
-               lost_found_time, lost_status, images, contact, status,
-               view_count, like_count, comment_count, report_count, collect_count,
+               images, contact, status,
+               like_count, comment_count, collect_count,
                create_time, update_time
         FROM post
         WHERE id IN

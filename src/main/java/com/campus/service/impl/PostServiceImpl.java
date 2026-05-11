@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -71,17 +68,12 @@ public class PostServiceImpl implements PostService {
         post.setCategory(req.getCategory());
         post.setPrice(req.getPrice());
         post.setLocation(req.getLocation());
-        post.setLostFoundTime(parseLostFoundTime(req.getLostFoundTime()));
-        post.setLostStatus(req.getLostStatus());
         post.setImages(req.getImages());
         post.setContact(req.getContact());
 
-        // 自动审核逻辑：未命中敏感词 -> 直接通过(status=1)，命中 -> 进入人工审核(status=0)
         post.setStatus(status);
-        post.setViewCount(0);
         post.setLikeCount(0);
         post.setCommentCount(0);
-        post.setReportCount(0);
 
         int rows = postMapper.insert(post);
         if (rows <= 0 || post.getId() == null) {
@@ -151,8 +143,6 @@ public class PostServiceImpl implements PostService {
         post.setCategory(req.getCategory());
         post.setPrice(req.getPrice());
         post.setLocation(req.getLocation());
-        post.setLostFoundTime(parseLostFoundTime(req.getLostFoundTime()));
-        post.setLostStatus(req.getLostStatus());
         post.setImages(req.getImages());
         post.setContact(req.getContact());
 
@@ -306,21 +296,6 @@ public class PostServiceImpl implements PostService {
         if (hitWord != null) {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "内容包含敏感词：" + hitWord);
         }
-    }
-
-    private Date parseLostFoundTime(String time) {
-        if (isBlank(time)) {
-            return null;
-        }
-        String trimmed = time.trim();
-        String[] formats = { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd" };
-        for (String fmt : formats) {
-            try {
-                return new SimpleDateFormat(fmt).parse(trimmed);
-            } catch (ParseException ignored) {
-            }
-        }
-        throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "lostFoundTime 格式应为 yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss");
     }
 
     private Post requireOwnedPost(Integer userId, Integer postId) {

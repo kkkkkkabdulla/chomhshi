@@ -9,7 +9,6 @@ public class User {
     private String phone;
     private String nickname;
     private String avatarUrl;
-    private Integer role;
     private Integer status;
     private String banReason;
     private String banRemark;
@@ -54,14 +53,6 @@ public class User {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
-    }
-
-    public Integer getRole() {
-        return role;
-    }
-
-    public void setRole(Integer role) {
-        this.role = role;
     }
 
     public Integer getStatus() {

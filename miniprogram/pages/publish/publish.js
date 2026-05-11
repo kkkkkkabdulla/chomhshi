@@ -115,8 +115,7 @@ Page({
       price: type === 2 ? Number(f.price) : null,
       images: JSON.stringify(this.data.imageUrls),
       contact: f.contact.trim(),
-      location: type === 1 && f.location ? f.location.trim() : null,
-      lostStatus: type === 1 ? 1 : null
+      location: type === 1 && f.location ? f.location.trim() : null
     };
 
     try {

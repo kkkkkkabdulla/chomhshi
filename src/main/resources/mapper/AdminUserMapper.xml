@@ -133,8 +133,8 @@
 
     <select id="findUserPosts" resultType="com.campus.entity.Post">
         SELECT id, user_id, type, title, description, category, price, location,
-               lost_found_time, lost_status, images, contact, status,
-               view_count, like_count, comment_count, report_count, collect_count,
+               images, contact, status,
+               like_count, comment_count, collect_count,
                create_time, update_time
         FROM post
         WHERE user_id = #{id}
@@ -157,8 +157,8 @@
 
     <select id="findUserCollects" resultType="com.campus.entity.Post">
         SELECT p.id, p.user_id, p.type, p.title, p.description, p.category, p.price, p.location,
-               p.lost_found_time, p.lost_status, p.images, p.contact, p.status,
-               p.view_count, p.like_count, p.comment_count, p.report_count, p.collect_count,
+               p.images, p.contact, p.status,
+               p.like_count, p.comment_count, p.collect_count,
                p.create_time, p.update_time
         FROM post_collect pc
         INNER JOIN post p ON p.id = pc.post_id

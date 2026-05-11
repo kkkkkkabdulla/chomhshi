@@ -13,15 +13,11 @@ public class Post {
     private String category;
     private BigDecimal price;
     private String location;
-    private Date lostFoundTime;
-    private Integer lostStatus;
     private String images;
     private String contact;
     private Integer status;
-    private Integer viewCount;
     private Integer likeCount;
     private Integer commentCount;
-    private Integer reportCount;
     private Integer collectCount;
     private Date createTime;
     private Date updateTime;
@@ -90,22 +86,6 @@ public class Post {
         this.location = location;
     }
 
-    public Date getLostFoundTime() {
-        return lostFoundTime;
-    }
-
-    public void setLostFoundTime(Date lostFoundTime) {
-        this.lostFoundTime = lostFoundTime;
-    }
-
-    public Integer getLostStatus() {
-        return lostStatus;
-    }
-
-    public void setLostStatus(Integer lostStatus) {
-        this.lostStatus = lostStatus;
-    }
-
     public String getImages() {
         return images;
     }
@@ -130,14 +110,6 @@ public class Post {
         this.status = status;
     }
 
-    public Integer getViewCount() {
-        return viewCount;
-    }
-
-    public void setViewCount(Integer viewCount) {
-        this.viewCount = viewCount;
-    }
-
     public Integer getLikeCount() {
         return likeCount;
     }
@@ -152,14 +124,6 @@ public class Post {
 
     public void setCommentCount(Integer commentCount) {
         this.commentCount = commentCount;
-    }
-
-    public Integer getReportCount() {
-        return reportCount;
-    }
-
-    public void setReportCount(Integer reportCount) {
-        this.reportCount = reportCount;
     }
 
     public Integer getCollectCount() {

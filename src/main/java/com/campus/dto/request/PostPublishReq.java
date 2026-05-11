@@ -32,12 +32,6 @@ public class PostPublishReq {
     @Length(max = 100, message = "地点长度不能超过100")
     private String location;
 
-    private String lostFoundTime;
-
-    @Min(value = 1, message = "失物状态错误")
-    @Max(value = 2, message = "失物状态错误")
-    private Integer lostStatus;
-
     @Length(max = 1000, message = "图片字段过长")
     private String images;
 
@@ -90,22 +84,6 @@ public class PostPublishReq {
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public String getLostFoundTime() {
-        return lostFoundTime;
-    }
-
-    public void setLostFoundTime(String lostFoundTime) {
-        this.lostFoundTime = lostFoundTime;
-    }
-
-    public Integer getLostStatus() {
-        return lostStatus;
-    }
-
-    public void setLostStatus(Integer lostStatus) {
-        this.lostStatus = lostStatus;
     }
 
     public String getImages() {

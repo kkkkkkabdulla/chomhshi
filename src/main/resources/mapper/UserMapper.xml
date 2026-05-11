@@ -10,7 +10,6 @@
         <result column="phone" property="phone"/>
         <result column="nickname" property="nickname"/>
         <result column="avatar_url" property="avatarUrl"/>
-        <result column="role" property="role"/>
         <result column="status" property="status"/>
         <result column="ban_reason" property="banReason"/>
         <result column="ban_remark" property="banRemark"/>
@@ -19,22 +18,22 @@
     </resultMap>
 
     <select id="findByPhone" resultMap="BaseResultMap">
-        SELECT id, openid, phone, nickname, avatar_url, role, status, ban_reason, ban_remark, create_time, update_time
+        SELECT id, openid, phone, nickname, avatar_url, status, ban_reason, ban_remark, create_time, update_time
         FROM user
         WHERE phone = #{phone}
         LIMIT 1
     </select>
 
     <select id="findById" resultMap="BaseResultMap">
-        SELECT id, openid, phone, nickname, avatar_url, role, status, ban_reason, ban_remark, create_time, update_time
+        SELECT id, openid, phone, nickname, avatar_url, status, ban_reason, ban_remark, create_time, update_time
         FROM user
         WHERE id = #{id}
         LIMIT 1
     </select>
 
     <insert id="insert" parameterType="com.campus.entity.User" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO user(openid, phone, nickname, avatar_url, role, status)
-        VALUES(#{openid}, #{phone}, #{nickname}, #{avatarUrl}, #{role}, #{status})
+        INSERT INTO user(openid, phone, nickname, avatar_url, status)
+        VALUES(#{openid}, #{phone}, #{nickname}, #{avatarUrl}, #{status})
     </insert>
 
     <update id="updateUserInfoById">

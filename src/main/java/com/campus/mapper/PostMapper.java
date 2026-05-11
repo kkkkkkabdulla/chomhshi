@@ -41,8 +41,6 @@ public interface PostMapper {
 
     int decreaseCommentCount(@Param("id") Integer id);
 
-    int increaseReportCount(@Param("id") Integer id);
-
     int increaseCollectCount(@Param("id") Integer id);
 
     int decreaseCollectCount(@Param("id") Integer id);

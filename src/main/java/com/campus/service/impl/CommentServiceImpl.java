@@ -181,10 +181,14 @@ public class CommentServiceImpl implements CommentService {
 
     private int countChildComments(Integer parentId, Integer postId) {
         List<PostCommentResp> all = postCommentMapper.findByPostId(postId);
+        return countDescendants(parentId, all);
+    }
+
+    private int countDescendants(Integer parentId, List<PostCommentResp> all) {
         int count = 0;
         for (PostCommentResp c : all) {
             if (parentId.equals(c.getParentId())) {
-                count++;
+                count += 1 + countDescendants(c.getId(), all);
             }
         }
         return count;

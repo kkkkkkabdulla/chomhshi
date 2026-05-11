@@ -159,3 +159,5 @@ CREATE TABLE IF NOT EXISTS `post_collect` (
   KEY `idx_user_id` (`user_id`),
   KEY `idx_post_id` (`post_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='帖子收藏表';
+
+UPDATE post p SET p.comment_count = (SELECT COUNT(1) FROM post_comment c WHERE c.post_id = p.id);

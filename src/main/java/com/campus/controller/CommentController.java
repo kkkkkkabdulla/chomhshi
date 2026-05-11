@@ -33,8 +33,8 @@ public class CommentController {
     @PostMapping("/add")
     public Result<CommentAddResp> add(@Valid @RequestBody CommentAddReq req, HttpServletRequest request) {
         User user = (User) request.getAttribute(TokenInterceptor.CURRENT_USER_ATTR);
-        Integer commentId = commentService.add(user.getId(), req);
-        return Result.success("评论成功", new CommentAddResp(commentId));
+        CommentAddResp resp = commentService.add(user.getId(), req);
+        return Result.success("评论成功", resp);
     }
 
     @GetMapping("/list/{postId}")

@@ -2,11 +2,12 @@ package com.campus.service;
 
 import com.campus.common.PageResult;
 import com.campus.dto.request.CommentAddReq;
+import com.campus.dto.response.CommentAddResp;
 import com.campus.dto.response.PostCommentResp;
 
 public interface CommentService {
 
-    Integer add(Integer userId, CommentAddReq req);
+    CommentAddResp add(Integer userId, CommentAddReq req);
 
     PageResult<PostCommentResp> list(Integer postId, Integer page, Integer pageSize);
 

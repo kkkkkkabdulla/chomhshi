@@ -1,6 +1,7 @@
 package com.campus.dto.response;
 
 import java.util.Date;
+import java.util.List;
 
 public class PostCommentResp {
 
@@ -13,6 +14,8 @@ public class PostCommentResp {
 
     private String nickname;
     private String avatarUrl;
+    private String replyToNickname;
+    private List<PostCommentResp> replies;
 
     public Integer getId() {
         return id;
@@ -76,5 +79,21 @@ public class PostCommentResp {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public String getReplyToNickname() {
+        return replyToNickname;
+    }
+
+    public void setReplyToNickname(String replyToNickname) {
+        this.replyToNickname = replyToNickname;
+    }
+
+    public List<PostCommentResp> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(List<PostCommentResp> replies) {
+        this.replies = replies;
     }
 }

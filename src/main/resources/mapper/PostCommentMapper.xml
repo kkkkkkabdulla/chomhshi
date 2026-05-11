@@ -22,6 +22,7 @@
         <result column="create_time" property="createTime"/>
         <result column="nickname" property="nickname"/>
         <result column="avatar_url" property="avatarUrl"/>
+        <result column="reply_to_nickname" property="replyToNickname"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.campus.entity.PostComment" useGeneratedKeys="true" keyProperty="id">
@@ -31,12 +32,14 @@
 
     <select id="findByPostId" resultMap="CommentRespMap">
         SELECT c.id, c.post_id, c.user_id, c.content, c.parent_id, c.create_time,
-               u.nickname, u.avatar_url
+               u.nickname, u.avatar_url,
+               pu.nickname AS reply_to_nickname
         FROM post_comment c
         LEFT JOIN user u ON c.user_id = u.id
+        LEFT JOIN post_comment pc ON c.parent_id = pc.id
+        LEFT JOIN user pu ON pc.user_id = pu.id
         WHERE c.post_id = #{postId}
-        ORDER BY c.id DESC
-        LIMIT #{offset}, #{pageSize}
+        ORDER BY c.id ASC
     </select>
 
     <select id="countByPostId" resultType="long">

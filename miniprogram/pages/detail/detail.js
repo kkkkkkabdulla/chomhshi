@@ -22,7 +22,8 @@ Page({
     commentList: [],
     imageList: [],
     categoryLabel: '',
-    liked: false,
+    replyToId: null,
+    replyToNickname: '',
   },
 
   onLoad(options) {
@@ -76,8 +77,15 @@ Page({
 
   async loadComments() {
     try {
-      const res = await api.getCommentList(this.data.id, { page: 1, pageSize: 20 });
-      this.setData({ commentList: (res.data && res.data.list) || [] });
+      const res = await api.getCommentList(this.data.id, { page: 1, pageSize: 50 });
+      var list = (res.data && res.data.list) || [];
+      var userInfo = wx.getStorageSync('userInfo');
+      var currentUserId = userInfo && userInfo.id;
+      for (var i = 0; i < list.length; i++) {
+        list[i].isOwner = (list[i].userId === currentUserId);
+        list[i].createTimeAgo = formatTimeAgo(list[i].createTime);
+      }
+      this.setData({ commentList: list });
     } catch (e) {}
   },
 
@@ -119,6 +127,23 @@ Page({
     this.setData({ commentContent: e.detail.value || '' });
   },
 
+  onReplyComment(e) {
+    var id = e.currentTarget.dataset.id;
+    var nickname = e.currentTarget.dataset.nickname;
+    var userId = e.currentTarget.dataset.userid;
+    var userInfo = wx.getStorageSync('userInfo');
+    var currentUserId = userInfo && userInfo.id;
+    if (userId === currentUserId) return;
+    this.setData({
+      replyToId: id,
+      replyToNickname: nickname || ('用户' + userId)
+    });
+  },
+
+  onCancelReply() {
+    this.setData({ replyToId: null, replyToNickname: '' });
+  },
+
   async onAddComment() {
     const content = (this.data.commentContent || '').trim();
     if (!content) {
@@ -130,12 +155,31 @@ Page({
       await api.addComment({
         postId: this.data.id,
         content,
-        parentId: 0
+        parentId: this.data.replyToId || 0
       });
-      this.setData({ commentContent: '' });
+      this.setData({ commentContent: '', replyToId: null, replyToNickname: '' });
       await Promise.allSettled([this.loadComments(), this.loadDetail()]);
       wx.showToast({ title: '评论成功', icon: 'success' });
     } catch (e) {}
+  },
+
+  onLongPressComment(e) {
+    var isOwner = e.currentTarget.dataset.isowner;
+    if (!isOwner) return;
+    var commentId = e.currentTarget.dataset.id;
+    if (!commentId) return;
+    var that = this;
+    wx.showModal({
+      title: '确认删除',
+      content: '删除后不可恢复，确定删除这条评论吗？',
+      success: function(res) {
+        if (!res.confirm) return;
+        api.deleteComment(commentId).then(function() {
+          Promise.allSettled([that.loadComments(), that.loadDetail()]);
+          wx.showToast({ title: '已删除', icon: 'success' });
+        }).catch(function() {});
+      }
+    });
   },
 
   async onReport() {
@@ -189,8 +233,27 @@ function parseImages(images) {
   }
 }
 
+function formatTimeAgo(timeStr) {
+  if (!timeStr) return '';
+  var date = new Date(timeStr);
+  if (isNaN(date.getTime())) return timeStr;
+  var now = new Date();
+  var diff = now.getTime() - date.getTime();
+  var seconds = Math.floor(diff / 1000);
+  if (seconds < 60) return '刚刚';
+  var minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return minutes + '分钟前';
+  var hours = Math.floor(minutes / 60);
+  if (hours < 24) return hours + '小时前';
+  var days = Math.floor(hours / 24);
+  if (days < 30) return days + '天前';
+  var months = Math.floor(days / 30);
+  if (months < 12) return months + '个月前';
+  return Math.floor(months / 12) + '年前';
+}
+
 function showActionSheetAsync(itemList) {
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     wx.showActionSheet({
       itemList,
       success: resolve,
@@ -200,19 +263,19 @@ function showActionSheetAsync(itemList) {
 }
 
 function showReportDescInput() {
-  return new Promise((resolve) => {
+  return new Promise(function(resolve) {
     wx.showModal({
       title: '补充描述（可选）',
       editable: true,
       placeholderText: '请输入举报补充说明',
-      success: (res) => {
+      success: function(res) {
         if (!res.confirm) {
           resolve(null);
           return;
         }
         resolve((res.content || '').trim());
       },
-      fail: () => resolve('')
+      fail: function() { resolve(''); }
     });
   });
 }

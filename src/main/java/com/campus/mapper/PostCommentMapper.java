@@ -10,9 +10,7 @@ public interface PostCommentMapper {
 
     int insert(PostComment postComment);
 
-    List<PostCommentResp> findByPostId(@Param("postId") Integer postId,
-                                       @Param("offset") Integer offset,
-                                       @Param("pageSize") Integer pageSize);
+    List<PostCommentResp> findByPostId(@Param("postId") Integer postId);
 
     long countByPostId(@Param("postId") Integer postId);
 

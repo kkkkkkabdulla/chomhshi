@@ -55,21 +55,23 @@
 
   <view wx:if="{{post.status !== 0 && post.status !== 3}}" class="detail-comment-input">
     <view class="comment-input-wrap">
-      <input class="comment-input" placeholder="输入评论后按发送" value="{{commentContent}}" bindinput="onCommentInput" confirm-type="send" bindconfirm="onAddComment" />
+      <input class="comment-input" placeholder="{{replyToId ? '回复 @' + replyToNickname : '输入评论后按发送'}}" value="{{commentContent}}" bindinput="onCommentInput" confirm-type="send" bindconfirm="onAddComment" />
+      <view wx:if="{{replyToId}}" class="reply-cancel" bindtap="onCancelReply">✕</view>
     </view>
   </view>
 
   <view class="card" wx:if="{{commentList.length}}">
     <view class="section-title">评论列表</view>
-    <view wx:for="{{commentList}}" wx:key="id" class="comment-item">
+    <view wx:for="{{commentList}}" wx:key="id" class="comment-item {{item.parentId && item.parentId > 0 ? 'comment-reply-item' : ''}}">
       <image src="{{item.avatarUrl || 'https://via.placeholder.com/88x88.png?text=U'}}" mode="aspectFill" class="comment-avatar" />
-      <view class="comment-body">
+      <view class="comment-body" bindtap="onReplyComment" data-id="{{item.id}}" data-nickname="{{item.nickname}}" data-userid="{{item.userId}}" bindlongpress="onLongPressComment" data-isowner="{{item.isOwner}}">
         <view class="comment-header">
           <view class="comment-nickname">{{item.nickname || ('用户' + item.userId)}}</view>
-          <view class="comment-id muted">#{{item.id}}</view>
+          <view class="comment-time">{{item.createTimeAgo}}</view>
         </view>
-        <view class="comment-content">{{item.content}}</view>
-        <view class="comment-time muted">{{item.createTime}}</view>
+        <view class="comment-content">
+          <text wx:if="{{item.replyToNickname}}" class="reply-prefix">回复 @{{item.replyToNickname}}：</text>{{item.content}}
+        </view>
       </view>
     </view>
   </view>

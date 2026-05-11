@@ -5,5 +5,8 @@
     <file url="file://$PROJECT_DIR$/src/main/resources/sql/02_index.sql" value="f8895fbb-4c06-45b1-9528-44003940c7ed" />
     <file url="file://$PROJECT_DIR$/src/main/resources/sql/03_init_data.sql" value="f8895fbb-4c06-45b1-9528-44003940c7ed" />
     <file url="file://$PROJECT_DIR$/src/main/resources/sql/04_demo_post_data.sql" value="f8895fbb-4c06-45b1-9528-44003940c7ed" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/sql/05_report_table_migration.sql" value="f8895fbb-4c06-45b1-9528-44003940c7ed" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/sql/06_announcement_table.sql" value="f8895fbb-4c06-45b1-9528-44003940c7ed" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/sql/07_user_ban_fields.sql" value="f8895fbb-4c06-45b1-9528-44003940c7ed" />
   </component>
 </project>
